@@ -7,7 +7,38 @@ type Props = {
   onReset: () => void
 }
 
+const REPO = 'HellNSab/KiPubli'
+
+function buildIssueUrl(book: BookMetadata, chain: OwnershipChain | null): string {
+  const title = `Erreur signalée : ${book.title} (ISBN ${book.isbn})`
+
+  const body = [
+    '**Livre**',
+    `Titre : ${book.title}`,
+    `Auteur(s) : ${book.authors.join(', ') || 'inconnu'}`,
+    `ISBN : ${book.isbn}`,
+    `Éditeur brut (Google Books) : ${book.publisherRaw ?? 'non renseigné'}`,
+    '',
+    '**Résultat affiché**',
+    chain
+      ? [
+          `Éditeur identifié : ${chain.publisher.name}`,
+          `Groupe : ${chain.group.name}`,
+          `Propriétaire : ${chain.group.owner}`,
+        ].join('\n')
+      : 'Aucun éditeur identifié dans la base.',
+    '',
+    '**Description de l\'erreur**',
+    '_Décrivez ici ce qui est incorrect ou manquant._',
+  ].join('\n')
+
+  const params = new URLSearchParams({ title, body, labels: 'données' })
+  return `https://github.com/${REPO}/issues/new?${params}`
+}
+
 export function ResultCard({ book, chain, onReset }: Props) {
+  const issueUrl = buildIssueUrl(book, chain)
+
   return (
     <div className="flex flex-col gap-6">
       <article className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
@@ -78,13 +109,23 @@ export function ResultCard({ book, chain, onReset }: Props) {
         </article>
       )}
 
-      <button
-        type="button"
-        onClick={onReset}
-        className="self-start rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-stone-800"
-      >
-        Scanner un autre livre
-      </button>
+      <div className="flex items-center gap-4">
+        <button
+          type="button"
+          onClick={onReset}
+          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-stone-800"
+        >
+          Scanner un autre livre
+        </button>
+        <a
+          href={issueUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="text-sm text-stone-500 underline-offset-2 hover:underline"
+        >
+          Signaler une erreur
+        </a>
+      </div>
     </div>
   )
 }
