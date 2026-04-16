@@ -57,6 +57,10 @@ export function ResultCard({ book, chain, onReset }: Props) {
               En savoir plus sur Wikipédia →
             </a>
           )}
+
+          <p className="mt-4 text-xs text-stone-400">
+            Données mises à jour bénévolement, susceptibles d'être incomplètes ou imprécises.
+          </p>
         </article>
       ) : (
         <article className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
@@ -65,7 +69,7 @@ export function ResultCard({ book, chain, onReset }: Props) {
             {book.publisherRaw ? (
               <>
                 Google Books indique <em>« {book.publisherRaw} »</em>, mais cet éditeur ne
-                figure pas encore dans notre base.
+                figure pas encore dans notre base, qui est mise à jour bénévolement.
               </>
             ) : (
               <>Aucune information d'éditeur n'a été trouvée pour ce livre.</>

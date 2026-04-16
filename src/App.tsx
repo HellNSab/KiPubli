@@ -103,7 +103,7 @@ function App() {
       </main>
 
       <footer className="mt-10 text-xs text-stone-400">
-        Données éditoriales saisies à la main · Métadonnées via Google Books
+        Données mises à jour bénévolement, susceptibles d'être incomplètes ou imprécises · Métadonnées via Google Books
       </footer>
     </div>
   )
