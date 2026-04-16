@@ -13,6 +13,9 @@ export function Scanner({ onDetected, onCancel }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [manual, setManual] = useState('')
   const [manualError, setManualError] = useState<string | null>(null)
+  const [torchOn, setTorchOn] = useState(false)
+  const [torchAvailable, setTorchAvailable] = useState(false)
+  const [scanning, setScanning] = useState(false)
   const scannerRef = useRef<Html5Qrcode | null>(null)
   const stoppedRef = useRef(false)
 
@@ -20,6 +23,7 @@ export function Scanner({ onDetected, onCancel }: Props) {
     const scanner = new Html5Qrcode(REGION_ID, {
       formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13],
       verbose: false,
+      experimentalFeatures: { useBarCodeDetectorIfSupported: true },
     })
     scannerRef.current = scanner
 
@@ -38,9 +42,13 @@ export function Scanner({ onDetected, onCancel }: Props) {
       .start(
         { facingMode: 'environment' },
         {
-          fps: 10,
-          qrbox: { width: 280, height: 140 },
-          aspectRatio: 1.4,
+          fps: 15,
+          // Wide box: barcodes are horizontal, fill most of the viewport width.
+          qrbox: (viewfinderWidth, viewfinderHeight) => ({
+            width: Math.round(viewfinderWidth * 0.9),
+            height: Math.round(viewfinderHeight * 0.45),
+          }),
+          aspectRatio: 16 / 9,
         },
         (decoded) => {
           if (stoppedRef.current) return
@@ -52,6 +60,14 @@ export function Scanner({ onDetected, onCancel }: Props) {
           // ignore per-frame "not found" errors
         },
       )
+      .then(() => {
+        setScanning(true)
+        // Check torch support via track capabilities
+        const caps = scanner.getRunningTrackCameraCapabilities?.()
+        if (caps?.torchFeature().isSupported()) {
+          setTorchAvailable(true)
+        }
+      })
       .catch((err: unknown) => {
         const message = err instanceof Error ? err.message : String(err)
         setError(
@@ -66,6 +82,21 @@ export function Scanner({ onDetected, onCancel }: Props) {
     }
   }, [onDetected])
 
+  async function toggleTorch() {
+    const scanner = scannerRef.current
+    if (!scanner) return
+    try {
+      const capabilities = scanner.getRunningTrackCameraCapabilities?.()
+      const torch = capabilities?.torchFeature()
+      if (!torch?.isSupported()) return
+      const next = !torchOn
+      await torch.apply(next)
+      setTorchOn(next)
+    } catch {
+      // torch not available on this device
+    }
+  }
+
   function submitManual(e: React.FormEvent) {
     e.preventDefault()
     const isbn = normalizeIsbn(manual)
@@ -79,11 +110,26 @@ export function Scanner({ onDetected, onCancel }: Props) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div
-        id={REGION_ID}
-        className="w-full overflow-hidden rounded-xl bg-black"
-        style={{ aspectRatio: '1.4 / 1' }}
-      />
+      <div className="relative w-full overflow-hidden rounded-xl bg-black" style={{ aspectRatio: '16 / 9' }}>
+        <div id={REGION_ID} className="h-full w-full" />
+
+        {scanning && torchAvailable && (
+          <button
+            type="button"
+            onClick={toggleTorch}
+            aria-label={torchOn ? 'Éteindre la lampe torche' : 'Allumer la lampe torche'}
+            className="absolute bottom-3 right-3 rounded-full bg-black/60 p-2 text-white backdrop-blur-sm"
+          >
+            {torchOn ? '🔦' : '💡'}
+          </button>
+        )}
+      </div>
+
+      {scanning && !error && (
+        <p className="text-center text-xs text-stone-500">
+          Centrez le code-barres dans le cadre et maintenez stable
+        </p>
+      )}
 
       {error && (
         <p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</p>
