@@ -1,5 +1,7 @@
+import { useState } from 'react'
 import type { BookMetadata } from '../lib/googleBooks'
 import type { OwnershipChain } from '../data/types'
+import { ReportModal } from './ReportModal'
 
 type Props = {
   book: BookMetadata
@@ -7,37 +9,8 @@ type Props = {
   onReset: () => void
 }
 
-const REPO = 'HellNSab/KiPubli'
-
-function buildIssueUrl(book: BookMetadata, chain: OwnershipChain | null): string {
-  const title = `Erreur signalée : ${book.title} (ISBN ${book.isbn})`
-
-  const body = [
-    '**Livre**',
-    `Titre : ${book.title}`,
-    `Auteur(s) : ${book.authors.join(', ') || 'inconnu'}`,
-    `ISBN : ${book.isbn}`,
-    `Éditeur brut (Google Books) : ${book.publisherRaw ?? 'non renseigné'}`,
-    '',
-    '**Résultat affiché**',
-    chain
-      ? [
-          `Éditeur identifié : ${chain.publisher.name}`,
-          `Groupe : ${chain.group.name}`,
-          `Propriétaire : ${chain.group.owner}`,
-        ].join('\n')
-      : 'Aucun éditeur identifié dans la base.',
-    '',
-    '**Description de l\'erreur**',
-    '_Décrivez ici ce qui est incorrect ou manquant._',
-  ].join('\n')
-
-  const params = new URLSearchParams({ title, body, labels: 'données' })
-  return `https://github.com/${REPO}/issues/new?${params}`
-}
-
 export function ResultCard({ book, chain, onReset }: Props) {
-  const issueUrl = buildIssueUrl(book, chain)
+  const [reporting, setReporting] = useState(false)
 
   return (
     <div className="flex flex-col gap-6">
@@ -117,15 +90,18 @@ export function ResultCard({ book, chain, onReset }: Props) {
         >
           Scanner un autre livre
         </button>
-        <a
-          href={issueUrl}
-          target="_blank"
-          rel="noreferrer"
+        <button
+          type="button"
+          onClick={() => setReporting(true)}
           className="text-sm text-stone-500 underline-offset-2 hover:underline"
         >
           Signaler une erreur
-        </a>
+        </button>
       </div>
+
+      {reporting && (
+        <ReportModal book={book} chain={chain} onClose={() => setReporting(false)} />
+      )}
     </div>
   )
 }
