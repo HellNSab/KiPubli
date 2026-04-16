@@ -2,7 +2,8 @@ import { getAllPublishers } from '../data/repository'
 import type { Publisher } from '../data/types'
 
 // Normalize for comparison: lowercase, strip accents, collapse whitespace.
-function normalize(s: string): string {
+function normalize(s: string | undefined | null): string {
+  if (!s) return ''
   return s
     .toLowerCase()
     .normalize('NFD')
