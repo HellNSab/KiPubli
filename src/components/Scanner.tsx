@@ -1,5 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
-import { Html5Qrcode, Html5QrcodeSupportedFormats } from 'html5-qrcode'
+import { useRef, useState } from 'react'
+import { Html5Qrcode } from 'html5-qrcode'
 import { isValidIsbn, normalizeIsbn } from '../lib/isbn'
 
 type Props = {
@@ -7,93 +7,39 @@ type Props = {
   onCancel: () => void
 }
 
-const REGION_ID = 'kipubli-scanner-region'
+// Hidden element required to instantiate Html5Qrcode for file scanning.
+const HIDDEN_ID = 'kipubli-scanner-hidden'
 
 export function Scanner({ onDetected, onCancel }: Props) {
+  const [processing, setProcessing] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [manual, setManual] = useState('')
   const [manualError, setManualError] = useState<string | null>(null)
-  const [torchOn, setTorchOn] = useState(false)
-  const [torchAvailable, setTorchAvailable] = useState(false)
-  const [scanning, setScanning] = useState(false)
-  const scannerRef = useRef<Html5Qrcode | null>(null)
-  const stoppedRef = useRef(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
-  useEffect(() => {
-    const scanner = new Html5Qrcode(REGION_ID, {
-      formatsToSupport: [Html5QrcodeSupportedFormats.EAN_13],
-      verbose: false,
-      experimentalFeatures: { useBarCodeDetectorIfSupported: true },
-    })
-    scannerRef.current = scanner
+  async function handleCapture(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
 
-    const stop = async () => {
-      if (stoppedRef.current) return
-      stoppedRef.current = true
-      try {
-        if (scanner.isScanning) await scanner.stop()
-        await scanner.clear()
-      } catch {
-        // best-effort cleanup
-      }
-    }
+    setProcessing(true)
+    setError(null)
 
-    scanner
-      .start(
-        { facingMode: 'environment' },
-        {
-          fps: 15,
-          // Wide box: barcodes are horizontal, fill most of the viewport width.
-          qrbox: (viewfinderWidth, viewfinderHeight) => ({
-            width: Math.round(viewfinderWidth * 0.9),
-            height: Math.round(viewfinderHeight * 0.45),
-          }),
-          aspectRatio: 16 / 9,
-        },
-        (decoded) => {
-          if (stoppedRef.current) return
-          const isbn = normalizeIsbn(decoded)
-          if (!isValidIsbn(isbn)) return
-          stop().then(() => onDetected(isbn))
-        },
-        () => {
-          // ignore per-frame "not found" errors
-        },
-      )
-      .then(() => {
-        setScanning(true)
-        // Check torch support via track capabilities
-        const caps = scanner.getRunningTrackCameraCapabilities?.()
-        if (caps?.torchFeature().isSupported()) {
-          setTorchAvailable(true)
-        }
-      })
-      .catch((err: unknown) => {
-        const message = err instanceof Error ? (err.message ?? '') : String(err)
-        setError(
-          message.toLowerCase().includes('permission')
-            ? "L'accès à la caméra a été refusé. Vous pouvez saisir l'ISBN manuellement."
-            : "Impossible d'ouvrir la caméra. Vous pouvez saisir l'ISBN manuellement.",
-        )
-      })
-
-    return () => {
-      void stop()
-    }
-  }, [onDetected])
-
-  async function toggleTorch() {
-    const scanner = scannerRef.current
-    if (!scanner) return
+    const scanner = new Html5Qrcode(HIDDEN_ID, { verbose: false })
     try {
-      const capabilities = scanner.getRunningTrackCameraCapabilities?.()
-      const torch = capabilities?.torchFeature()
-      if (!torch?.isSupported()) return
-      const next = !torchOn
-      await torch.apply(next)
-      setTorchOn(next)
+      const decoded = await scanner.scanFile(file, /* showImage */ false)
+      const isbn = normalizeIsbn(decoded)
+      if (isValidIsbn(isbn)) {
+        onDetected(isbn)
+      } else {
+        setError("Code scanné mais ce n'est pas un ISBN valide. Réessayez.")
+      }
     } catch {
-      // torch not available on this device
+      setError("Impossible de lire le code-barres. Cadrez bien le code ISBN et réessayez.")
+    } finally {
+      try { await scanner.clear() } catch { /* ignore */ }
+      setProcessing(false)
+      // Reset input so the same photo can be retried
+      if (fileInputRef.current) fileInputRef.current.value = ''
     }
   }
 
@@ -109,31 +55,37 @@ export function Scanner({ onDetected, onCancel }: Props) {
   }
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="relative w-full overflow-hidden rounded-xl bg-black" style={{ aspectRatio: '16 / 9' }}>
-        <div id={REGION_ID} className="h-full w-full" />
+    <div className="flex flex-col gap-6">
+      {/* Hidden element required by Html5Qrcode */}
+      <div id={HIDDEN_ID} className="hidden" />
 
-        {scanning && torchAvailable && (
-          <button
-            type="button"
-            onClick={toggleTorch}
-            aria-label={torchOn ? 'Éteindre la lampe torche' : 'Allumer la lampe torche'}
-            className="absolute bottom-3 right-3 rounded-full bg-black/60 p-2 text-white backdrop-blur-sm"
-          >
-            {torchOn ? '🔦' : '💡'}
-          </button>
+      <div className="flex flex-col items-center gap-4 rounded-xl border-2 border-dashed border-stone-300 px-6 py-10">
+        <p className="text-center text-sm text-stone-600">
+          Prenez une photo du code-barres ISBN avec l'appareil photo de votre téléphone.
+        </p>
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          capture="environment"
+          className="hidden"
+          onChange={handleCapture}
+        />
+        <button
+          type="button"
+          disabled={processing}
+          onClick={() => fileInputRef.current?.click()}
+          className="rounded-xl bg-accent px-6 py-3 text-base font-medium text-white shadow-sm hover:bg-orange-700 disabled:opacity-50"
+        >
+          {processing ? 'Analyse en cours…' : '📷 Ouvrir l\'appareil photo'}
+        </button>
+
+        {error && (
+          <p className="rounded-md bg-amber-50 px-4 py-3 text-center text-sm text-amber-900">
+            {error}
+          </p>
         )}
       </div>
-
-      {scanning && !error && (
-        <p className="text-center text-xs text-stone-500">
-          Centrez le code-barres dans le cadre et maintenez stable
-        </p>
-      )}
-
-      {error && (
-        <p className="rounded-md bg-amber-50 px-4 py-3 text-sm text-amber-900">{error}</p>
-      )}
 
       <form onSubmit={submitManual} className="flex flex-col gap-2">
         <label htmlFor="manual-isbn" className="text-sm font-medium text-ink">
