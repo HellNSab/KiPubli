@@ -69,7 +69,7 @@ export function Scanner({ onDetected, onCancel }: Props) {
         }
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : String(err)
+        const message = err instanceof Error ? (err.message ?? '') : String(err)
         setError(
           message.toLowerCase().includes('permission')
             ? "L'accès à la caméra a été refusé. Vous pouvez saisir l'ISBN manuellement."
