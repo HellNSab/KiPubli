@@ -21,54 +21,46 @@ The goal is **consumer transparency**: a reader in a bookshop can scan a book an
 
 ## Architecture decision
 
-**Option chosen: Supabase + PWA (no custom backend)**
+**Option chosen: static CSV files + PWA (no backend)**
 
-- Frontend: single React PWA (with two modes: user-facing scan UI and admin UI behind auth)
-- Database + API: Supabase (Postgres + auto-generated REST API + built-in auth)
+- Frontend: single React PWA
+- Database: two CSV files bundled in `public/data/` and fetched at runtime
 - External API: Google Books API (free, no key needed for basic lookups)
-- Deployment: Vercel or Netlify for the frontend, Supabase managed cloud for the DB
+- Deployment: GitHub Pages (auto-deployed via GitHub Actions on push to `main`)
 
-No NestJS or custom backend. The PWA talks directly to Supabase via the `@supabase/supabase-js` client. Row-level security (RLS) policies on Supabase handle access control.
+No backend, no Supabase, no auth. The data layer is fully static — publisher and group data lives in `public/data/publishers.csv` and `public/data/groups.csv`. To add or update data, edit those files and push.
+
+If the project grows to need community contributions or an admin UI, migrating to Supabase is straightforward: `src/data/repository.ts` is the single entry point for data access and can be swapped without touching the rest of the app.
 
 ---
 
 ## Data model
 
-Three tables:
+Two CSV files in `public/data/`:
 
-### `publishers`
+### `public/data/publishers.csv`
 | column | type | notes |
 |---|---|---|
-| id | uuid PK | |
-| name | text | e.g. "Éditions du Seuil" |
-| name_variants | text[] | alternate spellings for fuzzy matching |
-| country | text | default 'FR' |
-| founded_year | int | optional |
-| group_id | uuid FK | → groups.id |
-| created_at | timestamptz | |
-| updated_at | timestamptz | |
+| id | string | slug, e.g. "seuil" |
+| name | string | canonical name, e.g. "Le Seuil" |
+| name_variants | string | pipe-separated alternate spellings for fuzzy matching |
+| country | string | "FR", "BE", etc. |
+| founded_year | int | optional, leave blank if unknown |
+| group_id | string | → id in groups.csv |
 
-### `groups`
+### `public/data/groups.csv`
 | column | type | notes |
 |---|---|---|
-| id | uuid PK | |
-| name | text | e.g. "Média-Participations" |
-| owner | text | e.g. "Famille Lombard" |
-| listed | boolean | publicly traded? |
-| note | text | short editorial note shown to users |
-| wikipedia_url | text | optional reference |
-| created_at | timestamptz | |
-| updated_at | timestamptz | |
+| id | string | slug, e.g. "media-participations" |
+| name | string | e.g. "Média-Participations" |
+| owner | string | e.g. "Famille Lombard" |
+| listed | boolean | "true" or "false" — publicly traded? |
+| note | string | short editorial note shown to users (may contain commas — quote the field) |
+| wikipedia_url | string | optional reference |
 
-### `book_cache` (optional, for performance)
-| column | type | notes |
-|---|---|---|
-| isbn | text PK | |
-| title | text | |
-| author | text | |
-| publisher_raw | text | raw string from Google Books |
-| publisher_id | uuid FK | resolved publisher |
-| fetched_at | timestamptz | for cache invalidation |
+CSV fields containing commas must be wrapped in double quotes. Double quotes within a field are escaped as `""`.
+
+The TypeScript types in `src/data/types.ts` mirror this shape. Parsing and fetching happens in `src/data/csvLoader.ts`; `src/data/repository.ts` is the single entry point used by the rest of the app.
 
 ---
 
@@ -85,18 +77,7 @@ If no match is found in the publishers table, the app shows the raw publisher na
 
 ---
 
-## Auth / roles
-
-Two roles via Supabase Auth:
-
-- **anon**: can read `publishers` and `groups` (SELECT only). RLS policy: `true`.
-- **admin**: can insert/update/delete all tables. RLS policy: `auth.role() = 'authenticated'` + check against an `admins` table or a custom claim.
-
-The admin UI is the same React app, gated behind a login screen. No separate frontend repo needed.
-
----
-
-## Key French publishing groups to seed first
+## Key French publishing groups
 
 | Publisher | Group | Owner |
 |---|---|---|
@@ -115,25 +96,14 @@ The admin UI is the same React app, gated behind a login screen. No separate fro
 ## Tech stack summary
 
 ```
-React (Vite)
+React (Vite) — deployed to GitHub Pages
   ↓
-@supabase/supabase-js  ←→  Supabase (Postgres + RLS + Auth)
+public/data/*.csv  ← publisher + group database (static, fetched at runtime)
   ↓
-Google Books API (fetch, no SDK)
+Google Books API (fetch, no SDK)  ← ISBN → book metadata
   ↓
-html5-qrcode or @zxing/library  ← barcode scanning in browser
+html5-qrcode  ← barcode decoding from native camera photo
 ```
-
----
-
-## What to build first (suggested order)
-
-1. Supabase project setup: create tables, seed the ~10 major groups above, set RLS policies
-2. ISBN → Google Books lookup function
-3. Publisher fuzzy match function (simple includes/startsWith to start, improve later)
-4. User scan screen (camera → ISBN → result card)
-5. Admin CRUD UI (table view of publishers + groups, edit forms)
-6. PWA config (manifest.json, service worker for offline)
 
 ---
 
@@ -142,6 +112,7 @@ html5-qrcode or @zxing/library  ← barcode scanning in browser
 - The app UI language is **French** (labels, copy, etc.)
 - Keep the component structure simple — this is a side project, not an enterprise app
 - Prefer Tailwind CSS for styling
-- Use React Query or Supabase's built-in realtime for data fetching
-- The barcode scanner should request camera permission gracefully and fall back to manual ISBN input
+- The barcode scanner uses `<input type="file" capture="environment">` to open the native camera app — do not revert to a live video stream, the native camera gives far better image quality for barcode detection
+- `src/data/repository.ts` is the single data access entry point — all functions are async
+- CSV fetch paths must use `import.meta.env.BASE_URL` (not `/`) so they resolve correctly on GitHub Pages (`/KiPubli/`) and locally (`/`)
 - The ownership chain display is the most important UI element — give it visual hierarchy

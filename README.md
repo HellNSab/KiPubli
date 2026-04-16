@@ -1,73 +1,48 @@
-# React + TypeScript + Vite
+# Qui publie ce livre ?
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A PWA that lets users photograph a book's ISBN barcode and immediately see who owns the publishing rights — tracing the chain from the imprint up to the ultimate corporate owner.
 
-Currently, two official plugins are available:
+Live: **https://hellnsab.github.io/KiPubli/**
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+---
 
-## React Compiler
+## Stack
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- React + Vite + TypeScript
+- Tailwind CSS
+- `html5-qrcode` — barcode decoding from photos
+- Google Books API — ISBN → book metadata (no API key required)
+- Static CSV files — publisher/group database (no backend)
 
-## Expanding the ESLint configuration
+## Data
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+Publisher and group data lives in two CSV files in `public/data/`:
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+| File | Contents |
+|---|---|
+| `public/data/publishers.csv` | One row per imprint: `id, name, name_variants, country, founded_year, group_id` |
+| `public/data/groups.csv` | One row per group: `id, name, owner, listed, note, wikipedia_url` |
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+`name_variants` is a pipe-separated list of alternate spellings used for fuzzy matching against the raw publisher string from Google Books (e.g. `Gallimard|Éditions Gallimard|Gallimard Jeunesse`).
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+**To add or update publishers/groups, edit these CSV files directly** — no code changes needed.
+
+## How it works
+
+```
+ISBN photo → html5-qrcode decodes barcode → Google Books API → raw publisher name
+  → fuzzy match against publishers.csv → join to groups.csv → ownership chain
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+The CSV files are fetched at runtime (once, then cached in memory). Paths use `import.meta.env.BASE_URL` so they resolve correctly both locally and on GitHub Pages.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## Dev
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+npm install
+npm run dev
 ```
+
+## Deploy
+
+Pushing to `main` triggers the GitHub Actions workflow (`.github/workflows/deploy.yml`) which builds and deploys to GitHub Pages automatically.
