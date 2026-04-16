@@ -67,7 +67,7 @@ let publishersPromise: Promise<Publisher[]> | null = null
 
 export function loadGroups(): Promise<Group[]> {
   if (!groupsPromise) {
-    groupsPromise = fetch('/data/groups.csv')
+    groupsPromise = fetch(`${import.meta.env.BASE_URL}data/groups.csv`)
       .then((r) => r.text())
       .then((text) =>
         parseCSV(text).map((row) => ({
@@ -85,7 +85,7 @@ export function loadGroups(): Promise<Group[]> {
 
 export function loadPublishers(): Promise<Publisher[]> {
   if (!publishersPromise) {
-    publishersPromise = fetch('/data/publishers.csv')
+    publishersPromise = fetch(`${import.meta.env.BASE_URL}data/publishers.csv`)
       .then((r) => r.text())
       .then((text) =>
         parseCSV(text).map((row) => ({
