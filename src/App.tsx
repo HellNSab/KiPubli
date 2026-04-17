@@ -83,7 +83,7 @@ function App() {
 
       <InstallPrompt />
 
-      <footer className="mt-8 text-[11px] text-subtle">
+      <footer className="mt-8 text-center text-[11px] text-subtle">
         Données mises à jour bénévolement, susceptibles d'être incomplètes · Métadonnées via Google Books
       </footer>
     </div>
