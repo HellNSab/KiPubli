@@ -1,6 +1,10 @@
 import { loadGroups, loadPublishers } from './csvLoader'
 import type { Group, OwnershipChain, Publisher } from './types'
 
+export async function getAllGroups(): Promise<Group[]> {
+  return loadGroups()
+}
+
 export async function getAllPublishers(): Promise<Publisher[]> {
   return loadPublishers()
 }

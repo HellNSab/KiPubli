@@ -1,7 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Scanner } from './components/Scanner'
 import { ResultCard } from './components/ResultCard'
 import { InstallPrompt } from './components/InstallPrompt'
+import { AdminPage } from './pages/AdminPage'
 import { fetchBookByIsbn, type BookMetadata } from './lib/googleBooks'
 import { matchPublisher } from './lib/matchPublisher'
 import { getOwnershipChain } from './data/repository'
@@ -38,10 +39,27 @@ function saveRecents(results: ScanResult[]) {
 }
 
 function App() {
+  const [page, setPage] = useState<'app' | 'admin'>(() =>
+    window.location.hash === '#admin' ? 'admin' : 'app'
+  )
   const [view, setView] = useState<View>('home')
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [recentResults, setRecentResults] = useState<ScanResult[]>(loadRecents)
   const [viewedResult, setViewedResult] = useState<ScanResult | null>(null)
+
+  useEffect(() => {
+    const onHashChange = () => setPage(window.location.hash === '#admin' ? 'admin' : 'app')
+    window.addEventListener('hashchange', onHashChange)
+    return () => window.removeEventListener('hashchange', onHashChange)
+  }, [])
+
+  if (page === 'admin') {
+    return (
+      <AdminPage
+        onNavigateToApp={() => { window.location.hash = ''; setPage('app') }}
+      />
+    )
+  }
 
   function addToRecents(result: ScanResult) {
     setRecentResults(prev => {
@@ -156,7 +174,7 @@ function App() {
               {recentResults.map((result, i) => {
                 const badge = result.chain
                   ? result.chain.group.listed
-                    ? { label: 'Coté en bourse', className: 'bg-[#FEE2E2] text-[#991B1B]' }
+                    ? { label: 'Coté en bourse', className: 'bg-[#FEE2E2] text-[#991B1B] dark:bg-red-950/40 dark:text-red-300' }
                     : { label: 'Indépendant', className: 'bg-accent-tint text-[#4338CA] dark:bg-indigo-950/60 dark:text-accent-light' }
                   : null
 
