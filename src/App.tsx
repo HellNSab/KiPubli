@@ -14,15 +14,43 @@ type Status =
   | { kind: 'processing' }
   | { kind: 'error'; message: string }
 
-type LastResult = {
+type ScanResult = {
   book: BookMetadata
   chain: OwnershipChain | null
+}
+
+const MAX_RECENTS = 5
+const STORAGE_KEY = 'kipubli-recents'
+
+function loadRecents(): ScanResult[] {
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    return stored ? JSON.parse(stored) : []
+  } catch {
+    return []
+  }
+}
+
+function saveRecents(results: ScanResult[]) {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(results))
+  } catch { /* ignore quota errors */ }
 }
 
 function App() {
   const [view, setView] = useState<View>('home')
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
-  const [lastResult, setLastResult] = useState<LastResult | null>(null)
+  const [recentResults, setRecentResults] = useState<ScanResult[]>(loadRecents)
+  const [viewedResult, setViewedResult] = useState<ScanResult | null>(null)
+
+  function addToRecents(result: ScanResult) {
+    setRecentResults(prev => {
+      const deduped = prev.filter(r => r.book.isbn !== result.book.isbn)
+      const updated = [result, ...deduped].slice(0, MAX_RECENTS)
+      saveRecents(updated)
+      return updated
+    })
+  }
 
   async function handleIsbn(isbn: string) {
     setStatus({ kind: 'processing' })
@@ -34,7 +62,9 @@ function App() {
       }
       const publisher = book.publisherRaw ? await matchPublisher(book.publisherRaw) : null
       const chain = publisher ? await getOwnershipChain(publisher) : null
-      setLastResult({ book, chain })
+      const result: ScanResult = { book, chain }
+      addToRecents(result)
+      setViewedResult(result)
       setStatus({ kind: 'idle' })
       setView('result')
     } catch (err) {
@@ -43,10 +73,15 @@ function App() {
     }
   }
 
-  if (view === 'result' && lastResult) {
+  function openResult(result: ScanResult) {
+    setViewedResult(result)
+    setView('result')
+  }
+
+  // ── Result view ──────────────────────────────────────────────
+  if (view === 'result' && viewedResult) {
     return (
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
-        {/* Back navigation */}
         <button
           type="button"
           onClick={() => setView('home')}
@@ -59,7 +94,7 @@ function App() {
         </button>
 
         <main className="flex flex-1 flex-col gap-4">
-          <ResultCard book={lastResult.book} chain={lastResult.chain} />
+          <ResultCard book={viewedResult.book} chain={viewedResult.chain} />
         </main>
 
         <footer className="mt-8 text-center text-[11px] text-subtle">
@@ -69,10 +104,10 @@ function App() {
     )
   }
 
+  // ── Home view ────────────────────────────────────────────────
   return (
     <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
       <header className="mb-6 flex items-center gap-3">
-        {/* App icon */}
         <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
           <rect width="80" height="80" rx="20" fill="#4F46E5"/>
           <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
@@ -107,37 +142,58 @@ function App() {
           </div>
         )}
 
-        {lastResult && (
+        {recentResults.length > 0 && (
           <section className="flex flex-col gap-3">
             <div className="flex items-center gap-3">
               <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
               <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle">
-                Dernier résultat
+                Recherches récentes
               </p>
               <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
             </div>
 
-            {/* Compact teaser — taps to result view */}
-            <button
-              type="button"
-              onClick={() => setView('result')}
-              className="flex w-full items-center justify-between rounded-xl border border-[#E5E5E3] bg-white px-4 py-3.5 text-left transition-colors hover:bg-stone-50 dark:border-[#2A2A28] dark:bg-dark-card dark:hover:bg-[#242422]"
-            >
-              <div className="min-w-0">
-                <p className="truncate font-semibold text-ink dark:text-white">
-                  {lastResult.book.title}
-                </p>
-                <p className="mt-0.5 truncate text-sm text-muted">
-                  {[
-                    lastResult.book.authors[0],
-                    lastResult.chain?.publisher.name ?? lastResult.book.publisherRaw,
-                  ].filter(Boolean).join(' · ')}
-                </p>
-              </div>
-              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-3 shrink-0 text-subtle">
-                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
+            <div className="overflow-hidden rounded-2xl border border-[#E5E5E3] dark:border-[#2A2A28]">
+              {recentResults.map((result, i) => {
+                const badge = result.chain
+                  ? result.chain.group.listed
+                    ? { label: 'Coté en bourse', className: 'bg-[#FEE2E2] text-[#991B1B]' }
+                    : { label: 'Indépendant', className: 'bg-accent-tint text-[#4338CA] dark:bg-indigo-950/60 dark:text-accent-light' }
+                  : null
+
+                return (
+                  <div key={result.book.isbn}>
+                    {i > 0 && <div className="border-t border-[#E5E5E3] dark:border-[#2A2A28]" />}
+                    <button
+                      type="button"
+                      onClick={() => openResult(result)}
+                      className="flex w-full items-center gap-3 bg-white px-4 py-3.5 text-left transition-colors hover:bg-stone-50 dark:bg-dark-card dark:hover:bg-[#242422]"
+                    >
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate font-semibold text-ink dark:text-white">
+                          {result.book.title}
+                        </p>
+                        <div className="mt-0.5 flex items-center gap-2">
+                          <p className="truncate text-sm text-muted">
+                            {[
+                              result.book.authors[0],
+                              result.chain?.publisher.name ?? result.book.publisherRaw,
+                            ].filter(Boolean).join(' · ')}
+                          </p>
+                          {badge && (
+                            <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${badge.className}`}>
+                              {badge.label}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0 text-subtle">
+                        <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                      </svg>
+                    </button>
+                  </div>
+                )
+              })}
+            </div>
           </section>
         )}
       </main>
