@@ -162,8 +162,8 @@ export function ReportModal({ book, chain, onClose }: Props) {
 
             {/* Optional comment */}
             <div className="flex flex-col gap-1.5">
-              <label htmlFor="report-comment" className="text-sm font-medium text-ink">
-                Commentaire <span className="font-normal text-stone-400">(facultatif)</span>
+              <label htmlFor="report-comment" className="text-sm font-medium text-ink dark:text-white">
+                Commentaire <span className="font-normal text-stone-400 dark:text-subtle">(facultatif)</span>
               </label>
               <textarea
                 id="report-comment"
