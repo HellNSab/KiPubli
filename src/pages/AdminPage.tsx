@@ -456,21 +456,13 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     Groupes{' '}
                     <span className="ml-1.5 font-normal text-gray-400">{groups.length}</span>
                   </h2>
-                  <div className="flex items-center gap-2">
-                    <button
-                      onClick={() => setGroupsExpanded(v => !v)}
-                      className="rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10"
-                    >
-                      {groupsExpanded ? 'Réduire' : 'Tout afficher'}
-                    </button>
-                    <button
-                      disabled={!tokenAvailable}
-                      onClick={() => setAddModal('group')}
-                      className="rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
-                    >
-                      + Ajouter
-                    </button>
-                  </div>
+                  <button
+                    disabled={!tokenAvailable}
+                    onClick={() => setAddModal('group')}
+                    className="rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                  >
+                    + Ajouter
+                  </button>
                 </div>
                 <table className="w-full text-sm">
                   <thead>
@@ -511,6 +503,14 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     ))}
                   </tbody>
                 </table>
+                {groups.length > GROUPS_DEFAULT && (
+                  <button
+                    onClick={() => setGroupsExpanded(v => !v)}
+                    className="w-full border-t border-white/10 py-3 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+                  >
+                    {groupsExpanded ? 'Réduire' : `Tout afficher (${groups.length})`}
+                  </button>
+                )}
               </section>
 
               {/* Publishers */}
