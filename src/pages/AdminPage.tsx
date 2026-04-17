@@ -354,6 +354,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
   const [addModal, setAddModal] = useState<AddModal>(null)
   const [groupSearch, setGroupSearch] = useState('')
   const [publisherSearch, setPublisherSearch] = useState('')
+  const [publisherGroupFilter, setPublisherGroupFilter] = useState('')
 
   const tokenAvailable = hasToken()
 
@@ -372,7 +373,10 @@ export function AdminPage({ onNavigateToApp }: Props) {
   const countries = [...new Set(publishers.map(p => p.country))].length
   const GROUPS_DEFAULT = 4
   const filteredGroups = groups.filter(g => g.id.toLowerCase().includes(groupSearch.trim().toLowerCase()))
-  const filteredPublishers = publishers.filter(p => p.id.toLowerCase().includes(publisherSearch.trim().toLowerCase()))
+  const filteredPublishers = publishers.filter(p =>
+    p.id.toLowerCase().includes(publisherSearch.trim().toLowerCase()) &&
+    (publisherGroupFilter === '' || p.group_id === publisherGroupFilter)
+  )
   const displayedGroups = groupSearch.trim()
     ? filteredGroups
     : groupsExpanded ? filteredGroups : filteredGroups.slice(0, GROUPS_DEFAULT)
@@ -462,13 +466,15 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     Groupes{' '}
                     <span className="ml-1.5 font-normal text-gray-400">{filteredGroups.length}</span>
                   </h2>
-                  <input
-                    type="search"
-                    placeholder="Filtrer par ID…"
-                    value={groupSearch}
-                    onChange={e => setGroupSearch(e.target.value)}
-                    className="min-w-0 flex-1 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
-                  />
+                  <div className="ml-auto">
+                    <input
+                      type="search"
+                      placeholder="Filtrer par ID…"
+                      value={groupSearch}
+                      onChange={e => setGroupSearch(e.target.value)}
+                      className="w-40 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
                   <button
                     disabled={!tokenAvailable}
                     onClick={() => setAddModal('group')}
@@ -533,13 +539,25 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     Éditeurs{' '}
                     <span className="ml-1.5 font-normal text-gray-400">{filteredPublishers.length}</span>
                   </h2>
-                  <input
-                    type="search"
-                    placeholder="Filtrer par ID…"
-                    value={publisherSearch}
-                    onChange={e => setPublisherSearch(e.target.value)}
-                    className="min-w-0 flex-1 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
-                  />
+                  <div className="ml-auto flex items-center gap-2">
+                    <select
+                      value={publisherGroupFilter}
+                      onChange={e => setPublisherGroupFilter(e.target.value)}
+                      className="w-40 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 pr-8 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                    >
+                      <option value="">Tous les groupes</option>
+                      {groups.map(g => (
+                        <option key={g.id} value={g.id}>{g.name}</option>
+                      ))}
+                    </select>
+                    <input
+                      type="search"
+                      placeholder="Filtrer par ID…"
+                      value={publisherSearch}
+                      onChange={e => setPublisherSearch(e.target.value)}
+                      className="w-40 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                    />
+                  </div>
                   <button
                     disabled={!tokenAvailable}
                     onClick={() => setAddModal('publisher')}
