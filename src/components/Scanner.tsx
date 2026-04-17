@@ -37,7 +37,7 @@ export function Scanner({ onDetected, processing }: Props) {
 
     scanner
       .start(
-        { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
+        { facingMode: 'environment' },
         { fps: 10 },
         (decoded) => {
           const isbn = normalizeIsbn(decoded)
