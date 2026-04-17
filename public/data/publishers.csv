@@ -1,41 +1,42 @@
 id,name,name_variants,country,founded_year,group_id
-hachette,Hachette Livre,"Hachette|Hachette Livre|Hachette Romans|Hachette Éducation",FR,,lagardere
-grasset,Grasset,"Grasset|Éditions Grasset|Grasset & Fasquelle",FR,,lagardere
-fayard,Fayard,"Fayard|Éditions Fayard",FR,,lagardere
-stock,Stock,"Stock|Éditions Stock",FR,,lagardere
-calmann-levy,Calmann-Lévy,"Calmann-Lévy|Calmann Levy",FR,,lagardere
-jclattes,JC Lattès,"JC Lattès|Jean-Claude Lattès|J.-C. Lattès",FR,,lagardere
-lgf,Le Livre de Poche,"Le Livre de Poche|LGF|Librairie Générale Française",FR,,lagardere
-larousse,Larousse,"Larousse|Éditions Larousse",FR,,lagardere
+hachette,Hachette Livre,Hachette|Hachette Livre|Hachette Romans|Hachette Éducation,FR,,lagardere
+grasset,Grasset,Grasset|Éditions Grasset|Grasset & Fasquelle,FR,,lagardere
+fayard,Fayard,Fayard|Éditions Fayard,FR,,lagardere
+stock,Stock,Stock|Éditions Stock,FR,,lagardere
+calmann-levy,Calmann-Lévy,Calmann-Lévy|Calmann Levy,FR,,lagardere
+jclattes,JC Lattès,JC Lattès|Jean-Claude Lattès|J.-C. Lattès,FR,,lagardere
+lgf,Le Livre de Poche,Le Livre de Poche|LGF|Librairie Générale Française,FR,,lagardere
+larousse,Larousse,Larousse|Éditions Larousse,FR,,lagardere
 marabout,Marabout,Marabout,FR,,lagardere
-arenes,Les Arènes,"Les Arènes|Éditions des Arènes",FR,,lagardere
-laffont,Robert Laffont,"Robert Laffont|Éditions Robert Laffont",FR,,editis
-plon,Plon,"Plon|Éditions Plon",FR,,editis
-julliard,Julliard,"Julliard|Éditions Julliard",FR,,editis
-10-18,10/18,"10/18|10-18|Éditions 10/18",FR,,editis
-pocket,Pocket,"Pocket|Pocket Jeunesse",FR,,editis
-nathan,Nathan,"Nathan|Éditions Nathan",FR,,editis
-bordas,Bordas,"Bordas|Éditions Bordas",FR,,editis
-cherche-midi,Le Cherche Midi,"Le Cherche Midi|Cherche Midi",FR,,editis
-belfond,Belfond,"Belfond|Éditions Belfond",FR,,editis
-xo,XO Éditions,"XO|XO Éditions",FR,,editis
-gallimard,Gallimard,"Gallimard|Éditions Gallimard|Gallimard Jeunesse",FR,,madrigall
-folio,Folio,"Folio|Gallimard Folio",FR,,madrigall
-pleiade,La Pléiade,"La Pléiade|Bibliothèque de la Pléiade|Pléiade",FR,,madrigall
-flammarion,Flammarion,"Flammarion|Éditions Flammarion|Flammarion Jeunesse",FR,,madrigall
-casterman,Casterman,"Casterman|Éditions Casterman",FR,,madrigall
-autrement,Autrement,"Autrement|Éditions Autrement",FR,,madrigall
-denoel,Denoël,"Denoël|Éditions Denoël|Denoel",FR,,madrigall
+arenes,Les Arènes,Les Arènes|Éditions des Arènes,FR,,lagardere
+laffont,Robert Laffont,Robert Laffont|Éditions Robert Laffont,FR,,editis
+plon,Plon,Plon|Éditions Plon,FR,,editis
+julliard,Julliard,Julliard|Éditions Julliard,FR,,editis
+10-18,10/18,10/18|10-18|Éditions 10/18,FR,,editis
+pocket,Pocket,Pocket|Pocket Jeunesse,FR,,editis
+nathan,Nathan,Nathan|Éditions Nathan,FR,,editis
+bordas,Bordas,Bordas|Éditions Bordas,FR,,editis
+cherche-midi,Le Cherche Midi,Le Cherche Midi|Cherche Midi,FR,,editis
+belfond,Belfond,Belfond|Éditions Belfond,FR,,editis
+xo,XO Éditions,XO|XO Éditions,FR,,editis
+gallimard,Gallimard,Gallimard|Éditions Gallimard|Gallimard Jeunesse,FR,,madrigall
+folio,Folio,Folio|Gallimard Folio,FR,,madrigall
+pleiade,La Pléiade,La Pléiade|Bibliothèque de la Pléiade|Pléiade,FR,,madrigall
+flammarion,Flammarion,Flammarion|Éditions Flammarion|Flammarion Jeunesse,FR,,madrigall
+casterman,Casterman,Casterman|Éditions Casterman,FR,,madrigall
+autrement,Autrement,Autrement|Éditions Autrement,FR,,madrigall
+denoel,Denoël,Denoël|Éditions Denoël|Denoel,FR,,madrigall
 mercure,Mercure de France,Mercure de France,FR,,madrigall
-pol,P.O.L,"P.O.L|POL|Éditions P.O.L",FR,,madrigall
-seuil,Le Seuil,"Le Seuil|Éditions du Seuil|Seuil|Editions du Seuil",FR,,media-participations
-martiniere,La Martinière,"La Martinière|Éditions de la Martinière|Martinière",FR,,media-participations
-points,Points,"Points|Éditions Points",FR,,media-participations
-dargaud,Dargaud,"Dargaud|Éditions Dargaud",BE,,media-participations
-dupuis,Dupuis,"Dupuis|Éditions Dupuis",BE,,media-participations
-lombard,Le Lombard,"Le Lombard|Éditions du Lombard",BE,,media-participations
-actes-sud-pub,Actes Sud,"Actes Sud|Éditions Actes Sud|Actes Sud Jeunesse",FR,,actes-sud
-albin-michel-pub,Albin Michel,"Albin Michel|Éditions Albin Michel|Albin Michel Jeunesse",FR,,albin-michel
-belin,Belin,"Belin|Éditions Belin|Belin Éducation",FR,,humensis
-puf,PUF,"PUF|Presses universitaires de France|Presses Universitaires de France",FR,,humensis
-robert,Le Robert,"Le Robert|Éditions Le Robert|Dictionnaires Le Robert",FR,,humensis
+pol,P.O.L,P.O.L|POL|Éditions P.O.L,FR,,madrigall
+seuil,Le Seuil,Le Seuil|Éditions du Seuil|Seuil|Editions du Seuil,FR,,media-participations
+martiniere,La Martinière,La Martinière|Éditions de la Martinière|Martinière,FR,,media-participations
+points,Points,Points|Éditions Points,FR,,media-participations
+dargaud,Dargaud,Dargaud|Éditions Dargaud,BE,,media-participations
+dupuis,Dupuis,Dupuis|Éditions Dupuis,BE,,media-participations
+lombard,Le Lombard,Le Lombard|Éditions du Lombard,BE,,media-participations
+actes-sud-pub,Actes Sud,Actes Sud|Éditions Actes Sud|Actes Sud Jeunesse,FR,,actes-sud
+albin-michel-pub,Albin Michel,Albin Michel|Éditions Albin Michel|Albin Michel Jeunesse,FR,,albin-michel
+belin,Belin,Belin|Éditions Belin|Belin Éducation,FR,,humensis
+puf,PUF,PUF|Presses universitaires de France|Presses Universitaires de France,FR,,humensis
+robert,Le Robert,Le Robert|Éditions Le Robert|Dictionnaires Le Robert,FR,,humensis
+test,Test Again,"neldzsmlqd,ezsqx",FR,,madrigall
