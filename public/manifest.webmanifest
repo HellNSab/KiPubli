@@ -1,0 +1,27 @@
+{
+  "name": "Qui publie ce livre ?",
+  "short_name": "KiPubli",
+  "description": "Scannez l'ISBN d'un livre et découvrez à qui appartient l'éditeur.",
+  "start_url": "/KiPubli/",
+  "display": "standalone",
+  "background_color": "#fafaf7",
+  "theme_color": "#863bff",
+  "icons": [
+    {
+      "src": "/KiPubli/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/KiPubli/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "/KiPubli/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}

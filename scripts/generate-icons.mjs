@@ -1,0 +1,23 @@
+import sharp from 'sharp';
+import { readFileSync } from 'fs';
+import { fileURLToPath } from 'url';
+import { dirname, join } from 'path';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const root = join(__dirname, '..');
+const svgPath = join(root, 'public', 'favicon.svg');
+const svgBuffer = readFileSync(svgPath);
+
+const sizes = [
+  { file: 'icon-192.png', size: 192 },
+  { file: 'icon-512.png', size: 512 },
+  { file: 'apple-touch-icon.png', size: 180 },
+];
+
+for (const { file, size } of sizes) {
+  await sharp(svgBuffer, { density: Math.ceil((size / 48) * 72) })
+    .resize(size, size, { fit: 'contain', background: { r: 250, g: 250, b: 247, alpha: 1 } })
+    .png()
+    .toFile(join(root, 'public', file));
+  console.log(`Generated ${file}`);
+}
