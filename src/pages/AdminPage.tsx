@@ -178,6 +178,23 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
 
 const inputCls = 'rounded-lg border border-white/10 bg-[#111110] px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
 
+const Chevron = () => (
+  <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" width="14" height="14" viewBox="0 0 16 16" fill="none">
+    <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+  </svg>
+)
+
+function SelectWrap({ className, children, ...props }: React.SelectHTMLAttributes<HTMLSelectElement> & { className?: string }) {
+  return (
+    <div className="relative">
+      <select className={`w-full appearance-none ${className ?? ''}`} {...props}>
+        {children}
+      </select>
+      <Chevron />
+    </div>
+  )
+}
+
 // ── Group form ────────────────────────────────────────────────
 
 function GroupForm({ groups, onSaved, onClose }: { groups: Group[]; onSaved: () => void; onClose: () => void }) {
@@ -311,11 +328,11 @@ function PublisherForm({ groups, publishers, onSaved, onClose }: { groups: Group
           </Field>
         </div>
         <Field label="Groupe">
-          <select required className={`${inputCls.replace('px-3', 'pl-3 pr-8')}`} value={form.group_id} onChange={e => set('group_id', e.target.value)}>
+          <SelectWrap required className={inputCls} value={form.group_id} onChange={e => set('group_id', e.target.value)}>
             {groups.map(g => (
               <option key={g.id} value={g.id}>{g.name}</option>
             ))}
-          </select>
+          </SelectWrap>
         </Field>
 
         {error && <p className="rounded-lg bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
@@ -540,16 +557,16 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     <span className="ml-1.5 font-normal text-gray-400">{filteredPublishers.length}</span>
                   </h2>
                   <div className="ml-auto flex items-center gap-2">
-                    <select
+                    <SelectWrap
                       value={publisherGroupFilter}
                       onChange={e => setPublisherGroupFilter(e.target.value)}
-                      className="w-60 rounded-lg border border-white/10 bg-[#111110] pl-3 pr-8 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">Tous les groupes</option>
                       {groups.map(g => (
                         <option key={g.id} value={g.id}>{g.name}</option>
                       ))}
-                    </select>
+                    </SelectWrap>
                     <input
                       type="search"
                       placeholder="Filtrer par ID…"
