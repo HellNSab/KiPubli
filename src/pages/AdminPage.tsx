@@ -352,6 +352,8 @@ export function AdminPage({ onNavigateToApp }: Props) {
   const [tab, setTab] = useState<Tab>('données')
   const [groupsExpanded, setGroupsExpanded] = useState(false)
   const [addModal, setAddModal] = useState<AddModal>(null)
+  const [groupSearch, setGroupSearch] = useState('')
+  const [publisherSearch, setPublisherSearch] = useState('')
 
   const tokenAvailable = hasToken()
 
@@ -369,7 +371,11 @@ export function AdminPage({ onNavigateToApp }: Props) {
 
   const countries = [...new Set(publishers.map(p => p.country))].length
   const GROUPS_DEFAULT = 4
-  const displayedGroups = groupsExpanded ? groups : groups.slice(0, GROUPS_DEFAULT)
+  const filteredGroups = groups.filter(g => g.id.toLowerCase().includes(groupSearch.trim().toLowerCase()))
+  const filteredPublishers = publishers.filter(p => p.id.toLowerCase().includes(publisherSearch.trim().toLowerCase()))
+  const displayedGroups = groupSearch.trim()
+    ? filteredGroups
+    : groupsExpanded ? filteredGroups : filteredGroups.slice(0, GROUPS_DEFAULT)
 
   return (
     <div className="min-h-screen bg-[#111110] text-white">
@@ -451,15 +457,22 @@ export function AdminPage({ onNavigateToApp }: Props) {
 
               {/* Groups */}
               <section className="overflow-hidden rounded-xl border border-white/10">
-                <div className="flex items-center justify-between bg-white/5 px-5 py-4">
-                  <h2 className="text-sm font-semibold">
+                <div className="flex items-center gap-3 bg-white/5 px-5 py-4">
+                  <h2 className="shrink-0 text-sm font-semibold">
                     Groupes{' '}
-                    <span className="ml-1.5 font-normal text-gray-400">{groups.length}</span>
+                    <span className="ml-1.5 font-normal text-gray-400">{filteredGroups.length}</span>
                   </h2>
+                  <input
+                    type="search"
+                    placeholder="Filtrer par ID…"
+                    value={groupSearch}
+                    onChange={e => setGroupSearch(e.target.value)}
+                    className="min-w-0 flex-1 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                  />
                   <button
                     disabled={!tokenAvailable}
                     onClick={() => setAddModal('group')}
-                    className="rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="shrink-0 rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     + Ajouter
                   </button>
@@ -503,7 +516,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     ))}
                   </tbody>
                 </table>
-                {groups.length > GROUPS_DEFAULT && (
+                {!groupSearch.trim() && filteredGroups.length > GROUPS_DEFAULT && (
                   <button
                     onClick={() => setGroupsExpanded(v => !v)}
                     className="w-full border-t border-white/10 py-3 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
@@ -515,15 +528,22 @@ export function AdminPage({ onNavigateToApp }: Props) {
 
               {/* Publishers */}
               <section className="overflow-hidden rounded-xl border border-white/10">
-                <div className="flex items-center justify-between bg-white/5 px-5 py-4">
-                  <h2 className="text-sm font-semibold">
+                <div className="flex items-center gap-3 bg-white/5 px-5 py-4">
+                  <h2 className="shrink-0 text-sm font-semibold">
                     Éditeurs{' '}
-                    <span className="ml-1.5 font-normal text-gray-400">{publishers.length}</span>
+                    <span className="ml-1.5 font-normal text-gray-400">{filteredPublishers.length}</span>
                   </h2>
+                  <input
+                    type="search"
+                    placeholder="Filtrer par ID…"
+                    value={publisherSearch}
+                    onChange={e => setPublisherSearch(e.target.value)}
+                    className="min-w-0 flex-1 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                  />
                   <button
                     disabled={!tokenAvailable}
                     onClick={() => setAddModal('publisher')}
-                    className="rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="shrink-0 rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
                   >
                     + Ajouter
                   </button>
@@ -540,11 +560,11 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     </tr>
                   </thead>
                   <tbody>
-                    {publishers.map((p, i) => (
+                    {filteredPublishers.map((p, i) => (
                       <tr
                         key={p.id}
                         className={`transition-colors hover:bg-white/5 ${
-                          i < publishers.length - 1 ? 'border-b border-white/5' : ''
+                          i < filteredPublishers.length - 1 ? 'border-b border-white/5' : ''
                         }`}
                       >
                         <td className="px-5 py-3 font-mono text-xs text-gray-400">{p.id}</td>
