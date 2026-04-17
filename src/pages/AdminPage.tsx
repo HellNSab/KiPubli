@@ -355,8 +355,6 @@ export function AdminPage({ onNavigateToApp }: Props) {
 
   const tokenAvailable = hasToken()
 
-  if (!authed) return <AdminLock onUnlock={() => setAuthed(true)} />
-
   function loadData() {
     return Promise.all([getAllGroups(), getAllPublishers()]).then(([g, p]) => {
       setGroups(g)
@@ -365,7 +363,9 @@ export function AdminPage({ onNavigateToApp }: Props) {
     })
   }
 
-  useEffect(() => { loadData() }, [])
+  useEffect(() => { if (authed) loadData() }, [authed])
+
+  if (!authed) return <AdminLock onUnlock={() => setAuthed(true)} />
 
   const countries = [...new Set(publishers.map(p => p.country))].length
   const GROUPS_DEFAULT = 4
