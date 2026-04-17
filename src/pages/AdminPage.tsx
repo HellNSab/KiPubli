@@ -311,7 +311,7 @@ function PublisherForm({ groups, publishers, onSaved, onClose }: { groups: Group
           </Field>
         </div>
         <Field label="Groupe">
-          <select required className={inputCls} value={form.group_id} onChange={e => set('group_id', e.target.value)}>
+          <select required className={`${inputCls} pr-8`} value={form.group_id} onChange={e => set('group_id', e.target.value)}>
             {groups.map(g => (
               <option key={g.id} value={g.id}>{g.name}</option>
             ))}
