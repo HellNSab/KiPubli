@@ -15,8 +15,8 @@ const sizes = [
 ];
 
 for (const { file, size } of sizes) {
-  await sharp(svgBuffer, { density: Math.ceil((size / 48) * 72) })
-    .resize(size, size, { fit: 'contain', background: { r: 250, g: 250, b: 247, alpha: 1 } })
+  await sharp(svgBuffer, { density: Math.ceil((size / 80) * 72) })
+    .resize(size, size)
     .png()
     .toFile(join(root, 'public', file));
   console.log(`Generated ${file}`);

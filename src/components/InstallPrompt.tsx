@@ -48,12 +48,12 @@ export function InstallPrompt() {
 
   if (state.kind === 'android') {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
-        <p className="text-sm text-violet-800">Installer l'application sur votre téléphone</p>
+      <div className="mt-4 flex items-center justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint dark:border-indigo-800 dark:bg-indigo-950/40 px-4 py-3">
+        <p className="text-sm text-[#3730A3] dark:text-accent-light">Installer l'application sur votre téléphone</p>
         <button
           type="button"
           onClick={handleInstall}
-          className="ml-4 shrink-0 rounded-lg bg-violet-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-violet-700"
+          className="ml-4 shrink-0 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-hover"
         >
           Installer
         </button>
@@ -63,8 +63,8 @@ export function InstallPrompt() {
 
   if (state.kind === 'ios' && !iosDismissed) {
     return (
-      <div className="mt-4 flex items-start justify-between rounded-xl border border-violet-200 bg-violet-50 px-4 py-3">
-        <p className="text-sm text-violet-800">
+      <div className="mt-4 flex items-start justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint dark:border-indigo-800 dark:bg-indigo-950/40 px-4 py-3">
+        <p className="text-sm text-[#3730A3] dark:text-accent-light">
           Pour installer : appuyez sur{' '}
           <span className="font-medium">Partager</span>{' '}
           <svg className="inline h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
@@ -77,7 +77,7 @@ export function InstallPrompt() {
           type="button"
           onClick={() => setIosDismissed(true)}
           aria-label="Fermer"
-          className="ml-3 shrink-0 text-violet-400 hover:text-violet-600"
+          className="ml-3 shrink-0 text-accent/40 hover:text-accent"
         >
           ✕
         </button>

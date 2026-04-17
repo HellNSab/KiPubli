@@ -10,8 +10,15 @@ body,
 
 body {
   margin: 0;
-  background-color: #fafaf7;
-  color: #1a1a1a;
+  background-color: #FAFAFA;
+  color: #111110;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #0F0F0E;
+    color: #F5F5F4;
+  }
 }

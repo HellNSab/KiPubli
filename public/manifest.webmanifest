@@ -1,11 +1,11 @@
 {
-  "name": "Qui publie ce livre ?",
-  "short_name": "KiPubli",
+  "name": "À qui ?",
+  "short_name": "À qui ?",
   "description": "Scannez l'ISBN d'un livre et découvrez à qui appartient l'éditeur.",
   "start_url": "/KiPubli/",
   "display": "standalone",
-  "background_color": "#fafaf7",
-  "theme_color": "#863bff",
+  "background_color": "#FAFAFA",
+  "theme_color": "#4F46E5",
   "icons": [
     {
       "src": "/KiPubli/icon-192.png",

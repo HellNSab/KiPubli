@@ -7,106 +7,84 @@ import { matchPublisher } from './lib/matchPublisher'
 import { getOwnershipChain } from './data/repository'
 import type { OwnershipChain } from './data/types'
 
-type View =
-  | { kind: 'home' }
-  | { kind: 'scanning' }
-  | { kind: 'loading'; isbn: string }
+type Status =
+  | { kind: 'idle' }
+  | { kind: 'processing' }
   | { kind: 'error'; message: string }
-  | { kind: 'result'; book: BookMetadata; chain: OwnershipChain | null }
+
+type LastResult = {
+  book: BookMetadata
+  chain: OwnershipChain | null
+}
 
 function App() {
-  const [view, setView] = useState<View>({ kind: 'home' })
+  const [status, setStatus] = useState<Status>({ kind: 'idle' })
+  const [lastResult, setLastResult] = useState<LastResult | null>(null)
 
   async function handleIsbn(isbn: string) {
-    setView({ kind: 'loading', isbn })
+    setStatus({ kind: 'processing' })
     try {
       const book = await fetchBookByIsbn(isbn)
       if (!book) {
-        setView({
-          kind: 'error',
-          message: "Aucun livre trouvé pour cet ISBN. Vérifiez le code et réessayez.",
-        })
+        setStatus({ kind: 'error', message: "Aucun livre trouvé pour cet ISBN. Vérifiez le code et réessayez." })
         return
       }
       const publisher = book.publisherRaw ? await matchPublisher(book.publisherRaw) : null
       const chain = publisher ? await getOwnershipChain(publisher) : null
-      setView({ kind: 'result', book, chain })
+      setLastResult({ book, chain })
+      setStatus({ kind: 'idle' })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur inconnue'
-      setView({ kind: 'error', message: `Échec de la recherche : ${message}` })
+      setStatus({ kind: 'error', message: `Échec de la recherche : ${message}` })
     }
   }
 
   return (
-    <div className="mx-auto flex min-h-full max-w-xl flex-col px-5 py-8">
-      <header className="mb-8">
-        <h1 className="font-serif text-3xl font-semibold text-ink">
-          Qui publie ce livre ?
+    <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
+      <header className="mb-6">
+        <h1 className="text-[28px] font-semibold tracking-tight text-ink dark:text-white">
+          À qui ?
         </h1>
-        <p className="mt-1 text-sm text-stone-600">
-          Scannez l'ISBN d'un livre pour voir à qui appartient l'éditeur.
+        <p className="mt-0.5 text-sm text-muted dark:text-subtle">
+          Transparence éditoriale — savoir à qui appartient un livre
         </p>
       </header>
 
-      <main className="flex-1">
-        {view.kind === 'home' && (
-          <div className="flex flex-col gap-4">
+      <main className="flex flex-1 flex-col gap-5">
+        <Scanner onDetected={handleIsbn} processing={status.kind === 'processing'} />
+
+        {status.kind === 'error' && (
+          <div className="flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
+            <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
             <button
               type="button"
-              onClick={() => setView({ kind: 'scanning' })}
-              className="rounded-xl bg-accent px-5 py-4 text-lg font-medium text-white shadow-sm hover:bg-orange-700"
+              onClick={() => setStatus({ kind: 'idle' })}
+              aria-label="Fermer"
+              className="ml-3 shrink-0 text-red-400 hover:text-red-600"
             >
-              Scanner un livre
-            </button>
-            <p className="text-xs text-stone-500">
-              La caméra de votre appareil sera utilisée uniquement pour lire le code-barres.
-              Aucune image n'est conservée.
-            </p>
-          </div>
-        )}
-
-        {view.kind === 'scanning' && (
-          <Scanner
-            onDetected={handleIsbn}
-            onCancel={() => setView({ kind: 'home' })}
-          />
-        )}
-
-        {view.kind === 'loading' && (
-          <div className="flex flex-col items-center gap-3 py-12 text-stone-600">
-            <div className="h-8 w-8 animate-spin rounded-full border-2 border-stone-300 border-t-accent" />
-            <p className="text-sm">Recherche du livre {view.isbn}…</p>
-          </div>
-        )}
-
-        {view.kind === 'error' && (
-          <div className="flex flex-col gap-4">
-            <p className="rounded-md bg-red-50 px-4 py-3 text-sm text-red-800">
-              {view.message}
-            </p>
-            <button
-              type="button"
-              onClick={() => setView({ kind: 'home' })}
-              className="self-start rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-stone-800"
-            >
-              Réessayer
+              ✕
             </button>
           </div>
         )}
 
-        {view.kind === 'result' && (
-          <ResultCard
-            book={view.book}
-            chain={view.chain}
-            onReset={() => setView({ kind: 'home' })}
-          />
+        {lastResult && (
+          <section className="flex flex-col gap-3">
+            <div className="flex items-center gap-3">
+              <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
+              <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle">
+                Dernier résultat
+              </p>
+              <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
+            </div>
+            <ResultCard book={lastResult.book} chain={lastResult.chain} />
+          </section>
         )}
       </main>
 
       <InstallPrompt />
 
-      <footer className="mt-10 text-xs text-stone-400">
-        Données mises à jour bénévolement, susceptibles d'être incomplètes ou imprécises · Métadonnées via Google Books
+      <footer className="mt-8 text-[11px] text-subtle">
+        Données mises à jour bénévolement, susceptibles d'être incomplètes · Métadonnées via Google Books
       </footer>
     </div>
   )

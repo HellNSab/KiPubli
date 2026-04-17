@@ -6,129 +6,109 @@ import { ReportModal } from './ReportModal'
 type Props = {
   book: BookMetadata
   chain: OwnershipChain | null
-  onReset: () => void
 }
 
-export function ResultCard({ book, chain, onReset }: Props) {
+const CHAIN_DOTS = [
+  { color: '#818CF8', weight: 'font-normal' },
+  { color: '#4F46E5', weight: 'font-medium' },
+  { color: '#3730A3', weight: 'font-semibold' },
+]
+
+export function ResultCard({ book, chain }: Props) {
   const [reporting, setReporting] = useState(false)
 
   return (
-    <div className="flex flex-col gap-6">
-      <article className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-        <div className="flex gap-4">
-          {book.thumbnail && (
-            <img
-              src={book.thumbnail}
-              alt=""
-              className="h-28 w-auto rounded-md border border-stone-200 object-cover"
-            />
-          )}
-          <div className="flex flex-col gap-1">
-            <h2 className="font-serif text-xl leading-tight text-ink">{book.title}</h2>
-            {book.authors.length > 0 && (
-              <p className="text-sm text-stone-600">{book.authors.join(', ')}</p>
+    <div className="flex flex-col gap-3">
+      <div className="rounded-2xl border border-[#E5E5E3] bg-white p-4 dark:border-[#2A2A28] dark:bg-dark-card">
+        {/* Book */}
+        <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle">
+          {book.isbn}
+        </p>
+        <h2 className="mt-1 text-[17px] font-semibold leading-snug text-ink dark:text-white">
+          {book.title}
+        </h2>
+        {book.authors.length > 0 && (
+          <p className="mt-0.5 text-sm text-muted">{book.authors.join(', ')}</p>
+        )}
+
+        {chain ? (
+          <>
+            {/* Chain */}
+            <ol className="mt-4 flex flex-col gap-2">
+              {[
+                chain.publisher.name,
+                chain.group.name,
+                chain.group.owner,
+              ].map((value, i) => (
+                <li key={i} className="flex items-center gap-2.5">
+                  <span
+                    className="h-2 w-2 shrink-0 rounded-full"
+                    style={{ backgroundColor: CHAIN_DOTS[i].color }}
+                  />
+                  <span className={`text-sm text-ink dark:text-white ${CHAIN_DOTS[i].weight}`}>
+                    {value}
+                  </span>
+                </li>
+              ))}
+            </ol>
+
+            {/* Badge */}
+            <div className="mt-4">
+              {chain.group.listed ? (
+                <span className="inline-block rounded-lg bg-[#FEE2E2] px-3 py-1.5 text-sm font-medium text-[#991B1B]">
+                  Coté en bourse
+                </span>
+              ) : (
+                <span className="inline-block rounded-lg bg-accent-tint px-3 py-1.5 text-sm font-medium text-[#4338CA] dark:bg-indigo-950/50 dark:text-accent-light">
+                  Groupe indépendant
+                </span>
+              )}
+            </div>
+
+            {/* Note */}
+            {chain.group.note && (
+              <p className="mt-3 text-sm leading-relaxed text-muted dark:text-subtle">
+                {chain.group.note}
+              </p>
             )}
-            <p className="mt-1 text-xs uppercase tracking-wide text-stone-500">
-              ISBN {book.isbn}
+
+            {chain.group.wikipedia_url && (
+              <a
+                href={chain.group.wikipedia_url}
+                target="_blank"
+                rel="noreferrer"
+                className="mt-2 inline-block text-sm text-accent hover:underline dark:text-accent-light"
+              >
+                En savoir plus →
+              </a>
+            )}
+          </>
+        ) : (
+          <div className="mt-4 rounded-xl bg-amber-50 px-3 py-3 dark:bg-amber-950/30">
+            <p className="text-sm font-medium text-amber-900 dark:text-amber-300">
+              Éditeur non identifié
+            </p>
+            <p className="mt-1 text-sm text-amber-800 dark:text-amber-400">
+              {book.publisherRaw
+                ? <>Google Books indique <em>« {book.publisherRaw} »</em> mais cet éditeur ne figure pas encore dans notre base.</>
+                : <>Aucune information d'éditeur n'a été trouvée pour ce livre.</>
+              }
             </p>
           </div>
-        </div>
-      </article>
-
-      {chain ? (
-        <article className="rounded-2xl border border-stone-200 bg-white p-5 shadow-sm">
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-stone-500">
-            Chaîne de propriété
-          </h3>
-
-          <ol className="mt-4 flex flex-col gap-3">
-            <ChainStep label="Éditeur" value={chain.publisher.name} />
-            <ChainStep label="Groupe" value={chain.group.name} />
-            <ChainStep label="Propriétaire ultime" value={chain.group.owner} highlight />
-          </ol>
-
-          <p className="mt-5 border-t border-stone-100 pt-4 font-serif text-[15px] leading-relaxed text-stone-700">
-            {chain.group.note}
-          </p>
-
-          {chain.group.wikipedia_url && (
-            <a
-              href={chain.group.wikipedia_url}
-              target="_blank"
-              rel="noreferrer"
-              className="mt-3 inline-block text-sm text-accent hover:underline"
-            >
-              En savoir plus sur Wikipédia →
-            </a>
-          )}
-
-          <p className="mt-4 text-xs text-stone-400">
-            Données mises à jour bénévolement, susceptibles d'être incomplètes ou imprécises.
-          </p>
-        </article>
-      ) : (
-        <article className="rounded-2xl border border-amber-200 bg-amber-50 p-5">
-          <h3 className="text-sm font-semibold text-amber-900">Éditeur non identifié</h3>
-          <p className="mt-2 text-sm text-amber-900">
-            {book.publisherRaw ? (
-              <>
-                Google Books indique <em>« {book.publisherRaw} »</em>, mais cet éditeur ne
-                figure pas encore dans notre base, qui est mise à jour bénévolement.
-              </>
-            ) : (
-              <>Aucune information d'éditeur n'a été trouvée pour ce livre.</>
-            )}
-          </p>
-        </article>
-      )}
-
-      <div className="flex items-center gap-4">
-        <button
-          type="button"
-          onClick={onReset}
-          className="rounded-md bg-ink px-4 py-2 text-sm font-medium text-white hover:bg-stone-800"
-        >
-          Scanner un autre livre
-        </button>
-        <button
-          type="button"
-          onClick={() => setReporting(true)}
-          className="text-sm text-stone-500 underline-offset-2 hover:underline"
-        >
-          Signaler une erreur
-        </button>
+        )}
       </div>
+
+      <button
+        type="button"
+        onClick={() => setReporting(true)}
+        className="self-start text-xs text-subtle underline-offset-2 hover:underline hover:text-muted"
+      >
+        Signaler une erreur
+      </button>
 
       {reporting && (
         <ReportModal book={book} chain={chain} onClose={() => setReporting(false)} />
       )}
     </div>
-  )
-}
-
-function ChainStep({
-  label,
-  value,
-  highlight = false,
-}: {
-  label: string
-  value: string
-  highlight?: boolean
-}) {
-  return (
-    <li className="flex items-baseline gap-3">
-      <span className="w-32 shrink-0 text-xs uppercase tracking-wider text-stone-500">
-        {label}
-      </span>
-      <span
-        className={
-          highlight
-            ? 'font-serif text-lg font-semibold text-accent'
-            : 'font-serif text-base text-ink'
-        }
-      >
-        {value}
-      </span>
-    </li>
   )
 }

@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>À qui ? — Brand reference</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; background: #FAFAFA; color: #111110; padding: 48px 32px; max-width: 860px; margin: 0 auto; }
+    h1 { font-size: 13px; font-weight: 500; letter-spacing: 0.1em; text-transform: uppercase; color: #9B9B97; margin-bottom: 48px; }
+    h2 { font-size: 11px; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #9B9B97; margin-bottom: 16px; }
+    .section { margin-bottom: 48px; }
+    .divider { height: 0.5px; background: #E5E5E3; margin-bottom: 48px; }
+
+    /* Name */
+    .brand-name { font-size: 52px; font-weight: 500; letter-spacing: -1px; color: #111110; line-height: 1; margin-bottom: 6px; }
+    .brand-tagline { font-size: 15px; color: #6B6B68; }
+
+    /* Icons */
+    .icon-row { display: flex; gap: 24px; align-items: flex-end; flex-wrap: wrap; }
+    .icon-item { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+    .icon-caption { font-size: 11px; color: #9B9B97; text-align: center; }
+    .dark-surface { background: #0F0F0E; border-radius: 16px; padding: 20px; display: flex; gap: 16px; align-items: flex-end; }
+
+    /* Colors */
+    .color-grid { display: flex; gap: 12px; flex-wrap: wrap; }
+    .color-chip { border-radius: 10px; overflow: hidden; width: 120px; }
+    .color-swatch { height: 64px; }
+    .color-info { padding: 10px 12px; background: white; border: 0.5px solid #E5E5E3; border-top: none; border-radius: 0 0 10px 10px; }
+    .color-name { font-size: 12px; font-weight: 500; color: #111110; margin-bottom: 2px; }
+    .color-hex { font-size: 11px; color: #9B9B97; font-family: monospace; }
+    .color-role { font-size: 10px; color: #B4B2A9; margin-top: 2px; }
+
+    /* Typography */
+    .type-row { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 0.5px solid #E5E5E3; }
+    .type-row:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+    .type-meta { font-size: 11px; color: #9B9B97; margin-bottom: 6px; }
+    .type-sample-lg { font-size: 32px; font-weight: 500; color: #111110; letter-spacing: -0.5px; line-height: 1.1; }
+    .type-sample-md { font-size: 18px; font-weight: 500; color: #111110; }
+    .type-sample-sm { font-size: 14px; color: #111110; line-height: 1.6; }
+    .type-sample-xs { font-size: 11px; color: #6B6B68; letter-spacing: 0.06em; text-transform: uppercase; }
+
+    /* Spacing */
+    .spacing-row { display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap; }
+    .space-item { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+    .space-bar { background: #4F46E5; opacity: 0.15; border-radius: 3px; width: 32px; }
+    .space-label { font-size: 10px; color: #9B9B97; font-family: monospace; }
+
+    /* UI components preview */
+    .component-row { display: flex; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+    .badge { display: inline-block; font-size: 11px; font-weight: 500; padding: 4px 10px; border-radius: 20px; }
+    .badge-indep { background: #EEF2FF; color: #4338CA; }
+    .badge-group { background: #FEF3C7; color: #92400E; }
+    .badge-listed { background: #FEE2E2; color: #991B1B; }
+    .chain-card { background: white; border: 0.5px solid #E5E5E3; border-radius: 12px; padding: 14px 16px; width: 220px; }
+    .chain-item { display: flex; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 0.5px solid #F3F4F6; }
+    .chain-item:last-child { border-bottom: none; }
+    .chain-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .chain-label { font-size: 10px; color: #9B9B97; display: block; margin-bottom: 1px; }
+    .chain-value { font-size: 13px; color: #111110; font-weight: 500; }
+    .btn-primary { background: #4F46E5; color: white; border: none; border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+    .btn-secondary { background: white; color: #4F46E5; border: 1.5px solid #4F46E5; border-radius: 8px; padding: 10px 18px; font-size: 13px; font-weight: 500; cursor: pointer; }
+  </style>
+</head>
+<body>
+
+  <h1>À qui ? — Brand reference</h1>
+
+  <!-- Name & tagline -->
+  <div class="section">
+    <h2>Name</h2>
+    <p class="brand-name">À qui ?</p>
+    <p class="brand-tagline">Transparence éditoriale — savoir à qui appartient un livre</p>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Icons -->
+  <div class="section">
+    <h2>Icon</h2>
+    <div class="icon-row" style="margin-bottom: 24px;">
+      <div class="icon-item">
+        <svg width="96" height="96" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="#4F46E5"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="white">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/><circle cx="62" cy="60" r="6" fill="white"/><circle cx="62" cy="60" r="3" fill="#4F46E5"/></svg>
+        <span class="icon-caption">App icon<br>96px</span>
+      </div>
+      <div class="icon-item">
+        <svg width="60" height="60" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="#4F46E5"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="white">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/><circle cx="62" cy="60" r="6" fill="white"/><circle cx="62" cy="60" r="3" fill="#4F46E5"/></svg>
+        <span class="icon-caption">60px</span>
+      </div>
+      <div class="icon-item">
+        <svg width="44" height="44" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="#4F46E5"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="white">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/><circle cx="62" cy="60" r="6" fill="white"/><circle cx="62" cy="60" r="3" fill="#4F46E5"/></svg>
+        <span class="icon-caption">44px</span>
+      </div>
+      <div class="icon-item">
+        <svg width="32" height="32" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="#4F46E5"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="white">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/><circle cx="62" cy="60" r="6" fill="white"/><circle cx="62" cy="60" r="3" fill="#4F46E5"/></svg>
+        <span class="icon-caption">32px</span>
+      </div>
+      <div class="icon-item">
+        <svg width="20" height="20" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="#4F46E5"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="white">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/><circle cx="62" cy="60" r="6" fill="white"/><circle cx="62" cy="60" r="3" fill="#4F46E5"/></svg>
+        <span class="icon-caption">20px</span>
+      </div>
+    </div>
+    <div class="dark-surface">
+      <div class="icon-item">
+        <svg width="60" height="60" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="#4F46E5"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="white">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/><circle cx="62" cy="60" r="6" fill="white"/><circle cx="62" cy="60" r="3" fill="#4F46E5"/></svg>
+        <span class="icon-caption" style="color:#6B6B68;">App icon on dark</span>
+      </div>
+      <div class="icon-item">
+        <svg width="44" height="44" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="#1C1C1A"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="#818CF8">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="#818CF8"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="#818CF8" opacity="0.55"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="#818CF8" opacity="0.28"/><circle cx="62" cy="60" r="6" fill="#818CF8"/><circle cx="62" cy="60" r="3" fill="#1C1C1A"/></svg>
+        <span class="icon-caption" style="color:#6B6B68;">In-app dark</span>
+      </div>
+      <div class="icon-item">
+        <svg width="44" height="44" viewBox="0 0 80 80"><rect width="80" height="80" rx="20" fill="white" stroke="#E5E7EB" stroke-width="1.5"/><text x="29" y="50" text-anchor="middle" font-family="Georgia,serif" font-size="40" font-weight="700" fill="#4F46E5">?</text><rect x="42" y="24" width="22" height="5" rx="2.5" fill="#4F46E5"/><rect x="42" y="34" width="15" height="5" rx="2.5" fill="#4F46E5" opacity="0.5"/><rect x="42" y="44" width="9" height="5" rx="2.5" fill="#4F46E5" opacity="0.22"/><circle cx="62" cy="60" r="6" fill="#4F46E5"/><circle cx="62" cy="60" r="3" fill="white"/></svg>
+        <span class="icon-caption" style="color:#6B6B68;">In-app light</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Colors -->
+  <div class="section">
+    <h2>Colours</h2>
+    <div class="color-grid">
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#4F46E5;"></div>
+        <div class="color-info"><p class="color-name">Indigo</p><p class="color-hex">#4F46E5</p><p class="color-role">Primary accent</p></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#3730A3;"></div>
+        <div class="color-info"><p class="color-name">Indigo dark</p><p class="color-hex">#3730A3</p><p class="color-role">Hover / pressed</p></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#818CF8;"></div>
+        <div class="color-info"><p class="color-name">Indigo light</p><p class="color-hex">#818CF8</p><p class="color-role">Dark mode accent</p></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#EEF2FF;"></div>
+        <div class="color-info"><p class="color-name">Indigo tint</p><p class="color-hex">#EEF2FF</p><p class="color-role">Badges / surfaces</p></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#FAFAFA;"></div>
+        <div class="color-info"><p class="color-name">Off-white</p><p class="color-hex">#FAFAFA</p><p class="color-role">Light background</p></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#111110;"></div>
+        <div class="color-info"><p class="color-name">Near-black</p><p class="color-hex">#111110</p><p class="color-role">Primary text</p></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#0F0F0E;"></div>
+        <div class="color-info"><p class="color-name">Dark bg</p><p class="color-hex">#0F0F0E</p><p class="color-role">Dark background</p></div>
+      </div>
+      <div class="color-chip">
+        <div class="color-swatch" style="background:#6B6B68; border: 0.5px solid #E5E5E3;"></div>
+        <div class="color-info"><p class="color-name">Muted</p><p class="color-hex">#6B6B68</p><p class="color-role">Secondary text</p></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- Typography -->
+  <div class="section">
+    <h2>Typography — system font stack</h2>
+    <div class="type-row">
+      <p class="type-meta">Display — 32px / 500 / tracking -0.5px</p>
+      <p class="type-sample-lg">À qui appartient ce livre ?</p>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">Section heading — 18px / 500</p>
+      <p class="type-sample-md">Chaîne de propriété</p>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">Body — 14px / 400 / line-height 1.6</p>
+      <p class="type-sample-sm">Ce livre est publié par les Éditions du Seuil, qui appartiennent au groupe Média-Participations, lui-même détenu par la famille Lombard. Groupe familial indépendant, non coté en bourse.</p>
+    </div>
+    <div class="type-row">
+      <p class="type-meta">Label / overline — 11px / 500 / uppercase / tracking 0.06em</p>
+      <p class="type-sample-xs">Dernier résultat</p>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <!-- UI Components -->
+  <div class="section">
+    <h2>UI components</h2>
+    <div class="component-row" style="margin-bottom: 20px;">
+      <span class="badge badge-indep">Indépendant</span>
+      <span class="badge badge-group">Groupe concentré</span>
+      <span class="badge badge-listed">Coté en bourse</span>
+    </div>
+    <div class="component-row" style="margin-bottom: 20px;">
+      <button class="btn-primary">Scanner</button>
+      <button class="btn-secondary">ISBN manuel</button>
+    </div>
+    <div class="component-row">
+      <div class="chain-card">
+        <div style="font-size:11px; color:#9B9B97; margin-bottom:10px; letter-spacing:0.05em; text-transform:uppercase;">Le Monde selon Garp</div>
+        <div class="chain-item">
+          <div class="chain-dot" style="background:#818CF8;"></div>
+          <div><span class="chain-label">Éditeur</span><span class="chain-value">Éd. du Seuil</span></div>
+        </div>
+        <div class="chain-item">
+          <div class="chain-dot" style="background:#4F46E5;"></div>
+          <div><span class="chain-label">Groupe</span><span class="chain-value">Média-Participations</span></div>
+        </div>
+        <div class="chain-item">
+          <div class="chain-dot" style="background:#3730A3;"></div>
+          <div><span class="chain-label">Propriétaire</span><span class="chain-value">Famille Lombard</span></div>
+        </div>
+        <div style="margin-top:10px;"><span class="badge badge-indep">Indépendant</span></div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
