@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Scanner } from './components/Scanner'
 import { ResultCard } from './components/ResultCard'
+import { InstallPrompt } from './components/InstallPrompt'
 import { fetchBookByIsbn, type BookMetadata } from './lib/googleBooks'
 import { matchPublisher } from './lib/matchPublisher'
 import { getOwnershipChain } from './data/repository'
@@ -101,6 +102,8 @@ function App() {
           />
         )}
       </main>
+
+      <InstallPrompt />
 
       <footer className="mt-10 text-xs text-stone-400">
         Données mises à jour bénévolement, susceptibles d'être incomplètes ou imprécises · Métadonnées via Google Books
