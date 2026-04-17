@@ -11,7 +11,7 @@ type Mode = 'idle' | 'live' | 'fallback'
 
 const LIVE_ID = 'kipubli-scanner-live'
 const FILE_ID = 'kipubli-scanner-file'
-const FALLBACK_DELAY_MS = 10_000
+const FALLBACK_DELAY_MS = 5_000
 
 export function Scanner({ onDetected, processing }: Props) {
   const [mode, setMode] = useState<Mode>('idle')
@@ -37,7 +37,7 @@ export function Scanner({ onDetected, processing }: Props) {
 
     scanner
       .start(
-        { facingMode: 'environment' },
+        { facingMode: 'environment', width: { ideal: 1920 }, height: { ideal: 1080 } },
         { fps: 10 },
         (decoded) => {
           const isbn = normalizeIsbn(decoded)
