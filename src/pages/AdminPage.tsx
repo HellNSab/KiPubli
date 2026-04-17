@@ -472,7 +472,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       placeholder="Filtrer par ID…"
                       value={groupSearch}
                       onChange={e => setGroupSearch(e.target.value)}
-                      className="w-40 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
                   <button
@@ -543,7 +543,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     <select
                       value={publisherGroupFilter}
                       onChange={e => setPublisherGroupFilter(e.target.value)}
-                      className="w-40 rounded-lg border border-white/10 bg-[#111110] pl-3 pr-8 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-white/10 bg-[#111110] pl-3 pr-8 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">Tous les groupes</option>
                       {groups.map(g => (
@@ -555,7 +555,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       placeholder="Filtrer par ID…"
                       value={publisherSearch}
                       onChange={e => setPublisherSearch(e.target.value)}
-                      className="w-40 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
                   <button
