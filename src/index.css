@@ -22,3 +22,21 @@ body {
     color: #F5F5F4;
   }
 }
+
+/* Normalise html5-qrcode live-scan container so video fills the viewfinder */
+#kipubli-scanner-live,
+#kipubli-scanner-live > div {
+  width: 100% !important;
+  height: 100% !important;
+  padding: 0 !important;
+  border: none !important;
+}
+#kipubli-scanner-live video {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover;
+}
+/* Hide the status dashboard html5-qrcode injects below the video */
+[id$="__dashboard"] {
+  display: none !important;
+}
