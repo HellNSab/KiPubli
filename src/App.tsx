@@ -7,6 +7,8 @@ import { matchPublisher } from './lib/matchPublisher'
 import { getOwnershipChain } from './data/repository'
 import type { OwnershipChain } from './data/types'
 
+type View = 'home' | 'result'
+
 type Status =
   | { kind: 'idle' }
   | { kind: 'processing' }
@@ -18,6 +20,7 @@ type LastResult = {
 }
 
 function App() {
+  const [view, setView] = useState<View>('home')
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [lastResult, setLastResult] = useState<LastResult | null>(null)
 
@@ -33,21 +36,58 @@ function App() {
       const chain = publisher ? await getOwnershipChain(publisher) : null
       setLastResult({ book, chain })
       setStatus({ kind: 'idle' })
+      setView('result')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur inconnue'
       setStatus({ kind: 'error', message: `Échec de la recherche : ${message}` })
     }
   }
 
+  if (view === 'result' && lastResult) {
+    return (
+      <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
+        {/* Back navigation */}
+        <button
+          type="button"
+          onClick={() => setView('home')}
+          className="mb-6 flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-ink dark:text-subtle dark:hover:text-white"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Scanner un autre livre
+        </button>
+
+        <main className="flex flex-1 flex-col gap-4">
+          <ResultCard book={lastResult.book} chain={lastResult.chain} />
+        </main>
+
+        <footer className="mt-8 text-center text-[11px] text-subtle">
+          Données mises à jour bénévolement, susceptibles d'être incomplètes · Métadonnées via Google Books
+        </footer>
+      </div>
+    )
+  }
+
   return (
     <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
-      <header className="mb-6">
-        <h1 className="text-[28px] font-semibold tracking-tight text-ink dark:text-white">
-          À qui ?
-        </h1>
-        <p className="mt-0.5 text-sm text-muted dark:text-subtle">
-          Transparence éditoriale — savoir à qui appartient un livre
-        </p>
+      <header className="mb-6 flex items-center gap-3">
+        {/* App icon */}
+        <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
+          <rect width="80" height="80" rx="20" fill="#4F46E5"/>
+          <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
+          <rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/>
+          <rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/>
+          <rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/>
+          <circle cx="62" cy="60" r="6" fill="white"/>
+          <circle cx="62" cy="60" r="3" fill="#4F46E5"/>
+        </svg>
+        <div>
+          <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-ink dark:text-white">
+            À qui ?
+          </h1>
+          <p className="text-xs text-muted dark:text-subtle">Transparence éditoriale</p>
+        </div>
       </header>
 
       <main className="flex flex-1 flex-col gap-5">
@@ -76,7 +116,28 @@ function App() {
               </p>
               <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
             </div>
-            <ResultCard book={lastResult.book} chain={lastResult.chain} />
+
+            {/* Compact teaser — taps to result view */}
+            <button
+              type="button"
+              onClick={() => setView('result')}
+              className="flex w-full items-center justify-between rounded-xl border border-[#E5E5E3] bg-white px-4 py-3.5 text-left transition-colors hover:bg-stone-50 dark:border-[#2A2A28] dark:bg-dark-card dark:hover:bg-[#242422]"
+            >
+              <div className="min-w-0">
+                <p className="truncate font-semibold text-ink dark:text-white">
+                  {lastResult.book.title}
+                </p>
+                <p className="mt-0.5 truncate text-sm text-muted">
+                  {[
+                    lastResult.book.authors[0],
+                    lastResult.chain?.publisher.name ?? lastResult.book.publisherRaw,
+                  ].filter(Boolean).join(' · ')}
+                </p>
+              </div>
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-3 shrink-0 text-subtle">
+                <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </section>
         )}
       </main>
