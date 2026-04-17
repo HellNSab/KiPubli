@@ -11,7 +11,7 @@ type Mode = 'idle' | 'live' | 'fallback'
 
 const LIVE_ID = 'kipubli-scanner-live'
 const FILE_ID = 'kipubli-scanner-file'
-const FALLBACK_DELAY_MS = 30_000
+const FALLBACK_DELAY_MS = 10_000
 
 export function Scanner({ onDetected, processing }: Props) {
   const [mode, setMode] = useState<Mode>('idle')
