@@ -311,7 +311,7 @@ function PublisherForm({ groups, publishers, onSaved, onClose }: { groups: Group
           </Field>
         </div>
         <Field label="Groupe">
-          <select required className={`${inputCls} pr-8`} value={form.group_id} onChange={e => set('group_id', e.target.value)}>
+          <select required className={`${inputCls.replace('px-3', 'pl-3 pr-8')}`} value={form.group_id} onChange={e => set('group_id', e.target.value)}>
             {groups.map(g => (
               <option key={g.id} value={g.id}>{g.name}</option>
             ))}
@@ -543,7 +543,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     <select
                       value={publisherGroupFilter}
                       onChange={e => setPublisherGroupFilter(e.target.value)}
-                      className="w-40 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 pr-8 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                      className="w-40 rounded-lg border border-white/10 bg-[#111110] pl-3 pr-8 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">Tous les groupes</option>
                       {groups.map(g => (
