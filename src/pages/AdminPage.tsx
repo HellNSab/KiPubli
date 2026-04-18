@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { getAllGroups, getAllPublishers } from '../data/repository'
-import { saveGroup, savePublisher, hasToken } from '../lib/githubCsv'
+import { saveGroup, savePublisher, deleteGroup, deletePublisher, hasToken } from '../lib/githubCsv'
 import type { Group, Publisher } from '../data/types'
 
 // ── Admin lock screen ─────────────────────────────────────────
@@ -197,11 +197,12 @@ function SelectWrap({ className, children, ...props }: React.SelectHTMLAttribute
 
 // ── Group form ────────────────────────────────────────────────
 
-function GroupForm({ groups, onSaved, onClose }: { groups: Group[]; onSaved: () => void; onClose: () => void }) {
+function GroupForm({ groups, initialData, onSaved, onClose }: { groups: Group[]; initialData?: Group; onSaved: () => void; onClose: () => void }) {
   const empty: Group = { id: '', name: '', owner: '', listed: false, note: '', wikipedia_url: '' }
-  const [form, setForm] = useState<Group>(empty)
+  const [form, setForm] = useState<Group>(initialData ?? empty)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isEdit = Boolean(initialData)
 
   function set(field: keyof Group, value: string | boolean) {
     setForm(f => ({ ...f, [field]: value }))
@@ -222,11 +223,11 @@ function GroupForm({ groups, onSaved, onClose }: { groups: Group[]; onSaved: () 
   }
 
   return (
-    <Modal title="Ajouter un groupe" onClose={onClose}>
+    <Modal title={isEdit ? 'Modifier le groupe' : 'Ajouter un groupe'} onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
           <Field label="ID" hint="(slug, ex: lagardere)">
-            <input required className={inputCls} value={form.id} onChange={e => set('id', e.target.value)} placeholder="lagardere" />
+            <input required disabled={isEdit} className={`${inputCls} disabled:opacity-50`} value={form.id} onChange={e => set('id', e.target.value)} placeholder="lagardere" />
           </Field>
           <Field label="Nom">
             <input required className={inputCls} value={form.name} onChange={e => set('name', e.target.value)} placeholder="Lagardère" />
@@ -261,7 +262,7 @@ function GroupForm({ groups, onSaved, onClose }: { groups: Group[]; onSaved: () 
             disabled={saving}
             className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
           >
-            {saving ? 'Enregistrement…' : 'Enregistrer'}
+            {saving ? 'Enregistrement…' : isEdit ? 'Mettre à jour' : 'Enregistrer'}
           </button>
         </div>
       </form>
@@ -271,13 +272,18 @@ function GroupForm({ groups, onSaved, onClose }: { groups: Group[]; onSaved: () 
 
 // ── Publisher form ────────────────────────────────────────────
 
-function PublisherForm({ groups, publishers, onSaved, onClose }: { groups: Group[]; publishers: Publisher[]; onSaved: () => void; onClose: () => void }) {
-  const empty: Publisher & { name_variants_raw: string } = {
-    id: '', name: '', name_variants: [], name_variants_raw: '', country: 'FR', group_id: groups[0]?.id ?? '',
+function PublisherForm({ groups, publishers, initialData, onSaved, onClose }: { groups: Group[]; publishers: Publisher[]; initialData?: Publisher; onSaved: () => void; onClose: () => void }) {
+  const emptyForm = {
+    id: '', name: '', name_variants: [] as string[], name_variants_raw: '', country: 'FR', group_id: groups[0]?.id ?? '',
+    founded_year: undefined as number | undefined,
   }
-  const [form, setForm] = useState(empty)
+  const initialForm = initialData
+    ? { ...initialData, name_variants_raw: initialData.name_variants.join('|') }
+    : emptyForm
+  const [form, setForm] = useState(initialForm)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const isEdit = Boolean(initialData)
 
   function set(field: string, value: string) {
     setForm(f => ({ ...f, [field]: value }))
@@ -306,11 +312,11 @@ function PublisherForm({ groups, publishers, onSaved, onClose }: { groups: Group
   }
 
   return (
-    <Modal title="Ajouter un éditeur" onClose={onClose}>
+    <Modal title={isEdit ? "Modifier l'éditeur" : 'Ajouter un éditeur'} onClose={onClose}>
       <form onSubmit={handleSubmit} className="flex flex-col gap-4">
         <div className="grid grid-cols-2 gap-4">
           <Field label="ID" hint="(slug, ex: seuil)">
-            <input required className={inputCls} value={form.id} onChange={e => set('id', e.target.value)} placeholder="seuil" />
+            <input required disabled={isEdit} className={`${inputCls} disabled:opacity-50`} value={form.id} onChange={e => set('id', e.target.value)} placeholder="seuil" />
           </Field>
           <Field label="Nom canonique">
             <input required className={inputCls} value={form.name} onChange={e => set('name', e.target.value)} placeholder="Le Seuil" />
@@ -344,7 +350,7 @@ function PublisherForm({ groups, publishers, onSaved, onClose }: { groups: Group
             disabled={saving}
             className="rounded-lg bg-indigo-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-indigo-500 disabled:opacity-50"
           >
-            {saving ? 'Enregistrement…' : 'Enregistrer'}
+            {saving ? 'Enregistrement…' : isEdit ? 'Mettre à jour' : 'Enregistrer'}
           </button>
         </div>
       </form>
@@ -372,6 +378,8 @@ export function AdminPage({ onNavigateToApp }: Props) {
   const [groupSearch, setGroupSearch] = useState('')
   const [publisherSearch, setPublisherSearch] = useState('')
   const [publisherGroupFilter, setPublisherGroupFilter] = useState('')
+  const [editingGroup, setEditingGroup] = useState<Group | null>(null)
+  const [editingPublisher, setEditingPublisher] = useState<Publisher | null>(null)
 
   const tokenAvailable = hasToken()
 
@@ -508,35 +516,79 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Propriétaire</th>
                       <th className="w-24 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Coté</th>
                       <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Note</th>
+                      <th className="w-20 px-4 py-2.5"></th>
                     </tr>
                   </thead>
                   <tbody>
-                    {displayedGroups.map((g, i) => (
-                      <tr
-                        key={g.id}
-                        className={`transition-colors hover:bg-white/5 ${
-                          i < displayedGroups.length - 1 ? 'border-b border-white/5' : ''
-                        }`}
-                      >
-                        <td className="px-5 py-3.5 font-mono text-xs text-gray-400">{g.id}</td>
-                        <td className="px-4 py-3.5 font-semibold">{g.name}</td>
-                        <td className="px-4 py-3.5 text-gray-300">{g.owner}</td>
-                        <td className="px-4 py-3.5">
-                          {g.listed ? (
-                            <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-300">
-                              Coté
-                            </span>
-                          ) : (
-                            <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-gray-300">
-                              Indép.
-                            </span>
-                          )}
-                        </td>
-                        <td className="max-w-xs truncate px-4 py-3.5 text-xs text-gray-400">
-                          {g.note}
-                        </td>
-                      </tr>
-                    ))}
+                    {displayedGroups.map((g, i) => {
+                      const linkedPublishers = publishers.filter(p => p.group_id === g.id)
+                      const canDelete = linkedPublishers.length === 0
+                      return (
+                        <tr
+                          key={g.id}
+                          className={`transition-colors hover:bg-white/5 ${
+                            i < displayedGroups.length - 1 ? 'border-b border-white/5' : ''
+                          }`}
+                        >
+                          <td className="px-5 py-3.5 font-mono text-xs text-gray-400">{g.id}</td>
+                          <td className="px-4 py-3.5 font-semibold">{g.name}</td>
+                          <td className="px-4 py-3.5 text-gray-300">{g.owner}</td>
+                          <td className="px-4 py-3.5">
+                            {g.listed ? (
+                              <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-300">
+                                Coté
+                              </span>
+                            ) : (
+                              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-gray-300">
+                                Indép.
+                              </span>
+                            )}
+                          </td>
+                          <td className="max-w-xs truncate px-4 py-3.5 text-xs text-gray-400">
+                            {g.note}
+                          </td>
+                          <td className="px-4 py-3.5">
+                            <div className="flex items-center justify-end gap-1">
+                              <button
+                                disabled={!tokenAvailable}
+                                onClick={() => setEditingGroup(g)}
+                                className="rounded p-1.5 text-gray-500 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                                title="Modifier"
+                              >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                                </svg>
+                              </button>
+                              <div className="relative group/del">
+                                <button
+                                  disabled={!tokenAvailable || !canDelete}
+                                  onClick={async () => {
+                                    if (!confirm(`Supprimer le groupe « ${g.name} » ?`)) return
+                                    await deleteGroup(g.id, groups)
+                                    loadData()
+                                  }}
+                                  className="rounded p-1.5 text-gray-500 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+                                  title={canDelete ? 'Supprimer' : undefined}
+                                >
+                                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                    <polyline points="3 6 5 6 21 6"/>
+                                    <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                    <path d="M10 11v6M14 11v6"/>
+                                    <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                                  </svg>
+                                </button>
+                                {!canDelete && (
+                                  <div className="pointer-events-none absolute bottom-full right-0 mb-2 hidden w-52 rounded-lg bg-gray-900 px-3 py-2 text-xs text-gray-300 shadow-xl ring-1 ring-white/10 group-hover/del:block">
+                                    Ce groupe contient {linkedPublishers.length} éditeur{linkedPublishers.length > 1 ? 's' : ''} — supprimez-les d'abord.
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    })}
                   </tbody>
                 </table>
                 {!groupSearch.trim() && filteredGroups.length > GROUPS_DEFAULT && (
@@ -592,6 +644,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       <th className="w-16 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Pays</th>
                       <th className="w-20 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Fondé</th>
                       <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Groupe</th>
+                      <th className="w-20 px-4 py-2.5"></th>
                     </tr>
                   </thead>
                   <tbody>
@@ -621,6 +674,38 @@ export function AdminPage({ onNavigateToApp }: Props) {
                             {p.group_id}
                           </span>
                         </td>
+                        <td className="px-4 py-3">
+                          <div className="flex items-center justify-end gap-1">
+                            <button
+                              disabled={!tokenAvailable}
+                              onClick={() => setEditingPublisher(p)}
+                              className="rounded p-1.5 text-gray-500 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                              title="Modifier"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                                <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                              </svg>
+                            </button>
+                            <button
+                              disabled={!tokenAvailable}
+                              onClick={async () => {
+                                if (!confirm(`Supprimer l'éditeur « ${p.name} » ?`)) return
+                                await deletePublisher(p.id, publishers)
+                                loadData()
+                              }}
+                              className="rounded p-1.5 text-gray-500 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+                              title="Supprimer"
+                            >
+                              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="3 6 5 6 21 6"/>
+                                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+                                <path d="M10 11v6M14 11v6"/>
+                                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+                              </svg>
+                            </button>
+                          </div>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
@@ -635,19 +720,21 @@ export function AdminPage({ onNavigateToApp }: Props) {
         </main>
       </div>
 
-      {addModal === 'group' && (
+      {(addModal === 'group' || editingGroup) && (
         <GroupForm
           groups={groups}
+          initialData={editingGroup ?? undefined}
           onSaved={loadData}
-          onClose={() => setAddModal(null)}
+          onClose={() => { setAddModal(null); setEditingGroup(null) }}
         />
       )}
-      {addModal === 'publisher' && (
+      {(addModal === 'publisher' || editingPublisher) && (
         <PublisherForm
           groups={groups}
           publishers={publishers}
+          initialData={editingPublisher ?? undefined}
           onSaved={loadData}
-          onClose={() => setAddModal(null)}
+          onClose={() => { setAddModal(null); setEditingPublisher(null) }}
         />
       )}
     </div>

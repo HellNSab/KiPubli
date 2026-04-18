@@ -82,6 +82,13 @@ export async function saveGroup(group: Group, allGroups: Group[]): Promise<void>
   await putFile(GROUPS_PATH, csv, sha, `${isEdit ? 'Modifier' : 'Ajouter'} groupe "${group.id}"`)
 }
 
+export async function deleteGroup(groupId: string, allGroups: Group[]): Promise<void> {
+  const { sha } = await getFile(GROUPS_PATH)
+  const updated = allGroups.filter(g => g.id !== groupId)
+  const csv = serializeCSV(GROUPS_HEADERS, updated.map(groupToRow))
+  await putFile(GROUPS_PATH, csv, sha, `Supprimer groupe "${groupId}"`)
+}
+
 // ── Publishers ────────────────────────────────────────────────
 
 const PUBLISHERS_PATH = 'public/data/publishers.csv'
@@ -106,4 +113,11 @@ export async function savePublisher(publisher: Publisher, allPublishers: Publish
     : [...allPublishers, publisher]
   const csv = serializeCSV(PUBLISHERS_HEADERS, updated.map(publisherToRow))
   await putFile(PUBLISHERS_PATH, csv, sha, `${isEdit ? 'Modifier' : 'Ajouter'} éditeur "${publisher.id}"`)
+}
+
+export async function deletePublisher(publisherId: string, allPublishers: Publisher[]): Promise<void> {
+  const { sha } = await getFile(PUBLISHERS_PATH)
+  const updated = allPublishers.filter(p => p.id !== publisherId)
+  const csv = serializeCSV(PUBLISHERS_HEADERS, updated.map(publisherToRow))
+  await putFile(PUBLISHERS_PATH, csv, sha, `Supprimer éditeur "${publisherId}"`)
 }
