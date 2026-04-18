@@ -71,6 +71,8 @@ export async function pollDeployment(
   }
 
   // Phase 2: poll until the run completes (up to ~10 minutes)
+  await sleep(30_000)
+  if (signal.aborted) return
   for (let i = 0; i < 60; i++) {
     await sleep(10_000)
     if (signal.aborted) return
