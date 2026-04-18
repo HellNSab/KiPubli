@@ -371,13 +371,11 @@ function DeployToast({
   phase,
   runUrl,
   onDismiss,
-  onViewApp,
   onRetry,
 }: {
   phase: DeployPhase
   runUrl: string
   onDismiss: () => void
-  onViewApp: () => void
   onRetry: () => void
 }) {
   if (phase === 'idle') return null
@@ -419,7 +417,7 @@ function DeployToast({
               Sauvegardé
             </span>
             <div className="h-px flex-1 bg-indigo-500/60" />
-            <span className="font-medium text-indigo-400">Build CI</span>
+            <span className="animate-pulse font-medium text-indigo-400">Build CI</span>
             <div className="h-px flex-1 bg-white/10" />
             <span className="text-gray-500">En ligne</span>
           </div>
@@ -439,20 +437,6 @@ function DeployToast({
               <p className="mt-0.5 text-xs text-gray-400">Vos changements sont maintenant visibles dans l'app</p>
             </div>
             <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
-          </div>
-          <div className="mt-3 flex gap-2">
-            <button
-              onClick={onViewApp}
-              className="flex-1 rounded-lg bg-green-500 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-400"
-            >
-              Voir dans l'app
-            </button>
-            <button
-              onClick={onDismiss}
-              className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
-            >
-              Ignorer
-            </button>
           </div>
         </div>
       )}
@@ -474,14 +458,6 @@ function DeployToast({
             <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
           </div>
           <div className="mt-3 flex gap-2">
-            <a
-              href={runUrl}
-              target="_blank"
-              rel="noreferrer"
-              className="flex-1 rounded-lg bg-red-500 px-3 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-red-400"
-            >
-              Voir les logs
-            </a>
             <button
               onClick={onRetry}
               className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
@@ -896,7 +872,6 @@ export function AdminPage({ onNavigateToApp }: Props) {
         phase={deployPhase}
         runUrl={deployRunUrl}
         onDismiss={() => { deployAbort.current?.abort(); setDeployPhase('idle') }}
-        onViewApp={() => { window.open('https://hellnsab.github.io/KiPubli/', '_blank'); setDeployPhase('idle') }}
         onRetry={() => startPolling(deploySince.current)}
       />
 
