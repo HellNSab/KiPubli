@@ -1,6 +1,6 @@
 id,name,owner,listed,note,wikipedia_url
 lagardere,Lagardère Publishing (Hachette Livre),Vivendi / Bolloré (depuis 2023),true,"Hachette Livre est la branche édition du groupe Lagardère, contrôlé depuis 2023 par Vivendi (famille Bolloré). C'est le premier groupe d'édition français.",https://fr.wikipedia.org/wiki/Hachette_Livre
-editis,Editis,CMA CGM (famille Saadé),false,"Editis (Robert Laffont, Plon, Pocket…) a été cédé par Vivendi à Daniel Křetínský en 2023, puis racheté par CMA CGM (famille Saadé) en 2024.",https://fr.wikipedia.org/wiki/Editis
+editis,Editis,CMA CGM (famille Saadé),true,"Editis (Robert Laffont, Plon, Pocket…) a été cédé par Vivendi à Daniel Křetínský en 2023, puis racheté par CMA CGM (famille Saadé) en 2024.",https://fr.wikipedia.org/wiki/Editis
 madrigall,Madrigall (Gallimard / Flammarion),Famille Gallimard,false,"Madrigall regroupe Gallimard et Flammarion (rachat 2012). Toujours détenu par la famille Gallimard, c'est le dernier grand groupe français d'édition resté indépendant.",https://fr.wikipedia.org/wiki/Madrigall
 media-participations,Média-Participations,Famille Lombard,false,"Média-Participations (Le Seuil, La Martinière, Dargaud, Dupuis…) est un groupe familial belge dirigé par Vincent Montagne, indépendant des grands conglomérats.",https://fr.wikipedia.org/wiki/M%C3%A9dia-Participations
 actes-sud,Actes Sud,Famille Nyssen,false,"Maison indépendante fondée à Arles en 1978, toujours détenue par la famille Nyssen.",https://fr.wikipedia.org/wiki/Actes_Sud
