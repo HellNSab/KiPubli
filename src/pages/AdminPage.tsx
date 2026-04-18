@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { getAllGroups, getAllPublishers } from '../data/repository'
 import { saveGroup, savePublisher, deleteGroup, deletePublisher, hasToken } from '../lib/githubCsv'
+import { pollDeployment } from '../lib/deployPoller'
 import type { Group, Publisher } from '../data/types'
 
 // ── Admin lock screen ─────────────────────────────────────────
@@ -197,7 +198,7 @@ function SelectWrap({ className, children, ...props }: React.SelectHTMLAttribute
 
 // ── Group form ────────────────────────────────────────────────
 
-function GroupForm({ groups, initialData, onSaved, onClose }: { groups: Group[]; initialData?: Group; onSaved: () => void; onClose: () => void }) {
+function GroupForm({ groups, initialData, onSaveStart, onSaved, onSaveError, onClose }: { groups: Group[]; initialData?: Group; onSaveStart?: () => void; onSaved: () => void; onSaveError?: () => void; onClose: () => void }) {
   const empty: Group = { id: '', name: '', owner: '', listed: false, note: '', wikipedia_url: '' }
   const [form, setForm] = useState<Group>(initialData ?? empty)
   const [saving, setSaving] = useState(false)
@@ -212,12 +213,14 @@ function GroupForm({ groups, initialData, onSaved, onClose }: { groups: Group[];
     e.preventDefault()
     setError(null)
     setSaving(true)
+    onSaveStart?.()
     try {
       await saveGroup(form, groups)
       onSaved()
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      onSaveError?.()
       setSaving(false)
     }
   }
@@ -272,7 +275,7 @@ function GroupForm({ groups, initialData, onSaved, onClose }: { groups: Group[];
 
 // ── Publisher form ────────────────────────────────────────────
 
-function PublisherForm({ groups, publishers, initialData, onSaved, onClose }: { groups: Group[]; publishers: Publisher[]; initialData?: Publisher; onSaved: () => void; onClose: () => void }) {
+function PublisherForm({ groups, publishers, initialData, onSaveStart, onSaved, onSaveError, onClose }: { groups: Group[]; publishers: Publisher[]; initialData?: Publisher; onSaveStart?: () => void; onSaved: () => void; onSaveError?: () => void; onClose: () => void }) {
   const emptyForm = {
     id: '', name: '', name_variants: [] as string[], name_variants_raw: '', country: 'FR', group_id: groups[0]?.id ?? '',
     founded_year: undefined as number | undefined,
@@ -293,6 +296,7 @@ function PublisherForm({ groups, publishers, initialData, onSaved, onClose }: { 
     e.preventDefault()
     setError(null)
     setSaving(true)
+    onSaveStart?.()
     const publisher: Publisher = {
       id: form.id,
       name: form.name,
@@ -307,6 +311,7 @@ function PublisherForm({ groups, publishers, initialData, onSaved, onClose }: { 
       onClose()
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Erreur inconnue')
+      onSaveError?.()
       setSaving(false)
     }
   }
@@ -358,6 +363,138 @@ function PublisherForm({ groups, publishers, initialData, onSaved, onClose }: { 
   )
 }
 
+// ── Deploy toast ──────────────────────────────────────────────
+
+type DeployPhase = 'idle' | 'saving' | 'deploying' | 'live' | 'error'
+
+function DeployToast({
+  phase,
+  runUrl,
+  onDismiss,
+  onViewApp,
+  onRetry,
+}: {
+  phase: DeployPhase
+  runUrl: string
+  onDismiss: () => void
+  onViewApp: () => void
+  onRetry: () => void
+}) {
+  if (phase === 'idle') return null
+
+  return (
+    <div className="fixed bottom-6 right-6 z-50 w-80 select-none">
+      {phase === 'saving' && (
+        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-white/10">
+          <div className="flex items-center gap-3">
+            <div className="h-8 w-8 shrink-0 animate-spin rounded-full border-2 border-white/10 border-t-indigo-400" />
+            <div>
+              <p className="text-sm font-semibold text-white">Enregistrement...</p>
+              <p className="text-xs text-gray-400">Modification en cours de sauvegarde</p>
+            </div>
+          </div>
+          <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-white/10">
+            <div className="animate-indeterminate h-full w-1/4 rounded-full bg-indigo-500" />
+          </div>
+        </div>
+      )}
+
+      {phase === 'deploying' && (
+        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-indigo-500/60">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-500/20">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-white">Sauvegardé — déploiement en cours</p>
+              <p className="mt-0.5 text-xs text-gray-400">Les changements seront visibles dans 2–4 minutes</p>
+            </div>
+            <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
+          </div>
+          <div className="mt-3 flex items-center gap-2 text-xs">
+            <span className="flex items-center gap-1.5 text-green-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+              Sauvegardé
+            </span>
+            <div className="h-px flex-1 bg-indigo-500/60" />
+            <span className="font-medium text-indigo-400">Build CI</span>
+            <div className="h-px flex-1 bg-white/10" />
+            <span className="text-gray-500">En ligne</span>
+          </div>
+        </div>
+      )}
+
+      {phase === 'live' && (
+        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-green-500/60">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/20">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-green-400">Modification en ligne</p>
+              <p className="mt-0.5 text-xs text-gray-400">Vos changements sont maintenant visibles dans l'app</p>
+            </div>
+            <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <button
+              onClick={onViewApp}
+              className="flex-1 rounded-lg bg-green-500 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-green-400"
+            >
+              Voir dans l'app
+            </button>
+            <button
+              onClick={onDismiss}
+              className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            >
+              Ignorer
+            </button>
+          </div>
+        </div>
+      )}
+
+      {phase === 'error' && (
+        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-red-500/60">
+          <div className="flex items-start gap-3">
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/20">
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/>
+                <line x1="12" y1="8" x2="12" y2="12"/>
+                <line x1="12" y1="16" x2="12.01" y2="16"/>
+              </svg>
+            </div>
+            <div className="min-w-0 flex-1">
+              <p className="text-sm font-semibold text-red-400">Échec du déploiement</p>
+              <p className="mt-0.5 text-xs text-gray-400">Le build CI a échoué. Vos données sont sauvegardées.</p>
+            </div>
+            <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
+          </div>
+          <div className="mt-3 flex gap-2">
+            <a
+              href={runUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="flex-1 rounded-lg bg-red-500 px-3 py-2 text-center text-sm font-semibold text-white transition-colors hover:bg-red-400"
+            >
+              Voir les logs
+            </a>
+            <button
+              onClick={onRetry}
+              className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+            >
+              Réessayer
+            </button>
+          </div>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Page ──────────────────────────────────────────────────────
 
 type Tab = 'données' | 'signalements'
@@ -380,6 +517,10 @@ export function AdminPage({ onNavigateToApp }: Props) {
   const [publisherGroupFilter, setPublisherGroupFilter] = useState('')
   const [editingGroup, setEditingGroup] = useState<Group | null>(null)
   const [editingPublisher, setEditingPublisher] = useState<Publisher | null>(null)
+  const [deployPhase, setDeployPhase] = useState<DeployPhase>('idle')
+  const [deployRunUrl, setDeployRunUrl] = useState('https://github.com/HellNSab/KiPubli/actions')
+  const deployAbort = useRef<AbortController | null>(null)
+  const deploySince = useRef<Date>(new Date())
 
   const tokenAvailable = hasToken()
 
@@ -389,6 +530,37 @@ export function AdminPage({ onNavigateToApp }: Props) {
       setPublishers(p)
       setLoading(false)
     })
+  }
+
+  function startPolling(since: Date) {
+    deployAbort.current?.abort()
+    const ctrl = new AbortController()
+    deployAbort.current = ctrl
+    setDeployPhase('deploying')
+    pollDeployment(
+      import.meta.env.VITE_GITHUB_TOKEN ?? '',
+      since,
+      {
+        onQueued: url => setDeployRunUrl(url),
+        onSuccess: () => setDeployPhase('live'),
+        onFailure: url => { setDeployRunUrl(url); setDeployPhase('error') },
+      },
+      ctrl.signal
+    )
+  }
+
+  function handleSaveStart() {
+    deploySince.current = new Date()
+    setDeployPhase('saving')
+  }
+
+  function handleSaved() {
+    loadData()
+    startPolling(deploySince.current)
+  }
+
+  function handleSaveError() {
+    setDeployPhase('idle')
   }
 
   useEffect(() => { if (authed) loadData() }, [authed])
@@ -720,11 +892,21 @@ export function AdminPage({ onNavigateToApp }: Props) {
         </main>
       </div>
 
+      <DeployToast
+        phase={deployPhase}
+        runUrl={deployRunUrl}
+        onDismiss={() => { deployAbort.current?.abort(); setDeployPhase('idle') }}
+        onViewApp={() => { window.open('https://hellnsab.github.io/KiPubli/', '_blank'); setDeployPhase('idle') }}
+        onRetry={() => startPolling(deploySince.current)}
+      />
+
       {(addModal === 'group' || editingGroup) && (
         <GroupForm
           groups={groups}
           initialData={editingGroup ?? undefined}
-          onSaved={loadData}
+          onSaveStart={handleSaveStart}
+          onSaved={handleSaved}
+          onSaveError={handleSaveError}
           onClose={() => { setAddModal(null); setEditingGroup(null) }}
         />
       )}
@@ -733,7 +915,9 @@ export function AdminPage({ onNavigateToApp }: Props) {
           groups={groups}
           publishers={publishers}
           initialData={editingPublisher ?? undefined}
-          onSaved={loadData}
+          onSaveStart={handleSaveStart}
+          onSaved={handleSaved}
+          onSaveError={handleSaveError}
           onClose={() => { setAddModal(null); setEditingPublisher(null) }}
         />
       )}
