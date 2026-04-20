@@ -1,202 +1,150 @@
-import { useState, useMemo } from 'react'
+import { useMemo, useState } from 'react'
+import { pie, arc } from 'd3-shape'
+import { packSiblings } from 'd3-hierarchy'
+import { BOOK_MONEY_DATA, type Slice } from '../data/bookMoneyData'
 
-const CX = 140
-const CY = 140
+// ── Layout constants ──────────────────────────────────────────
+const W = 280
+const H = 280
+const CX = W / 2
+const CY = H / 2
 const OUTER_R = 126
-const INNER_R = 50
-const GAP_DEG = 2.5
+const INNER_R = 52
+const GAP = 0.03 // radians between slices
 
-type Seg = {
-  key: string
-  label: string
-  pct: number
-  amountStr: string
-  color: string
-  note: string
+// ── D3 pie layout ─────────────────────────────────────────────
+const makePie = pie<Slice>()
+  .value(d => d.pct)
+  .sort(null)
+  .padAngle(GAP)
+
+const makeArc = arc<ReturnType<typeof makePie>[number]>()
+  .innerRadius(INNER_R)
+  .outerRadius(OUTER_R)
+
+// ── Circle packing per slice ──────────────────────────────────
+type PackedNode = { x: number; y: number; r: number; label?: string; actorIndex: number }
+
+function packSlice(slice: Slice, arcDatum: ReturnType<typeof makePie>[number]): PackedNode[] {
+  const span = arcDatum.endAngle - arcDatum.startAngle
+  // Narrow slices get smaller circles so the cluster fits within the wedge
+  const narrowScale = slice.pct < 0.08 ? 0.55 : 1
+
+  // Arc area ≈ span × (R² - r²) / 2
+  const arcArea = (span * (OUTER_R ** 2 - INNER_R ** 2)) / 2
+  const baseScale = Math.sqrt(arcArea * 0.006)
+
+  const nodes = slice.actors.map((a, i) => ({
+    r: Math.sqrt(a.weight) * baseScale * narrowScale,
+    label: a.label,
+    actorIndex: i,
+    x: 0,
+    y: 0,
+  }))
+
+  packSiblings(nodes)
+
+  return nodes as PackedNode[]
 }
 
-const SEGMENTS: Seg[] = [
-  {
-    key: 'librairie', label: 'Librairie', pct: 30, amountStr: '~6,00 €', color: '#0ea472',
-    note: 'Principale source de revenu de la librairie indépendante — loyer, personnel, conseil.',
-  },
-  {
-    key: 'editeur', label: 'Éditeur', pct: 28, amountStr: '~5,60 €', color: '#4f46e5',
-    note: 'Fabrication, corrections, mise en page, marketing et marge de l\'éditeur.',
-  },
-  {
-    key: 'distrib', label: 'Distrib.', pct: 13, amountStr: '~2,60 €', color: '#d97706',
-    note: 'Diffusion et distribution physique — de l\'imprimeur jusqu\'à la librairie.',
-  },
-  {
-    key: 'auteur', label: 'Auteur', pct: 10, amountStr: '~2,00 €', color: '#db2777',
-    note: 'Droits d\'auteur (royalties) — généralement 8–12 % du prix HT.',
-  },
-  {
-    key: 'tva', label: 'TVA', pct: 6, amountStr: '~1,10 €', color: '#64748b',
-    note: 'Taux réduit 5,5 % · exception culturelle française',
-  },
-  {
-    key: 'groupe', label: 'Groupe', pct: 8, amountStr: '~1,60 €', color: '#818cf8',
-    note: 'Part remontant vers les actionnaires du groupe éditorial (Hachette/LVMH, Editis/CMA CGM…).',
-  },
-]
-
-const TOTAL = SEGMENTS.reduce((s, seg) => s + seg.pct, 0)
-
-function polar(cx: number, cy: number, r: number, deg: number) {
-  const rad = (deg - 90) * (Math.PI / 180)
-  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) }
-}
-
-function donutPath(outerR: number, innerR: number, startDeg: number, endDeg: number): string {
-  const oS = polar(CX, CY, outerR, startDeg)
-  const oE = polar(CX, CY, outerR, endDeg)
-  const iS = polar(CX, CY, innerR, startDeg)
-  const iE = polar(CX, CY, innerR, endDeg)
-  const large = (endDeg - startDeg) > 180 ? 1 : 0
-  return [
-    `M ${oS.x.toFixed(2)} ${oS.y.toFixed(2)}`,
-    `A ${outerR} ${outerR} 0 ${large} 1 ${oE.x.toFixed(2)} ${oE.y.toFixed(2)}`,
-    `L ${iE.x.toFixed(2)} ${iE.y.toFixed(2)}`,
-    `A ${innerR} ${innerR} 0 ${large} 0 ${iS.x.toFixed(2)} ${iS.y.toFixed(2)}`,
-    'Z',
-  ].join(' ')
-}
-
-function packBubbles(
-  startDeg: number, endDeg: number, pct: number,
-): Array<{ x: number; y: number; r: number }> {
-  // Deterministic LCG seeded by segment geometry
-  let state = ((pct * 997 + startDeg * 71 + endDeg * 37) | 0) >>> 0
-  if (state === 0) state = 1
-  const rand = () => {
-    state = (Math.imul(state, 1664525) + 1013904223) >>> 0
-    return state / 0x100000000
-  }
-
-  const placed: Array<{ x: number; y: number; r: number }> = []
-  const target = Math.round(pct * 0.72)
-  const sizes = [11.5, 9, 7, 5.5, 4.5, 3.5, 2.8]
-
-  for (const br of sizes) {
-    const minRad = INNER_R + br + 2
-    const maxRad = OUTER_R - br - 2
-    if (minRad > maxRad) continue
-
-    for (let attempt = 0; attempt < 400 && placed.length < target; attempt++) {
-      const radPos = minRad + rand() * (maxRad - minRad)
-      const angBuf = Math.min((br / radPos) * (180 / Math.PI) * 0.7, (endDeg - startDeg) * 0.35)
-      const minAng = startDeg + angBuf
-      const maxAng = endDeg - angBuf
-      if (minAng >= maxAng) continue
-
-      const angPos = minAng + rand() * (maxAng - minAng)
-      const rads = (angPos - 90) * (Math.PI / 180)
-      const px = CX + radPos * Math.cos(rads)
-      const py = CY + radPos * Math.sin(rads)
-
-      const ok = placed.every(c => {
-        const d = Math.sqrt((c.x - px) ** 2 + (c.y - py) ** 2)
-        return d > c.r + br + 1.5
-      })
-
-      if (ok) placed.push({ x: px, y: py, r: br })
-    }
-
-    if (placed.length >= target) break
-  }
-
-  return placed
-}
-
+// ── Component ─────────────────────────────────────────────────
 export function BookMoneyChart() {
-  const [active, setActive] = useState('tva')
+  const [activeId, setActiveId] = useState('tva')
 
-  const segs = useMemo(() => {
-    let cursor = -90
-    return SEGMENTS.map(seg => {
-      const span = (seg.pct / TOTAL) * 360
-      const start = cursor + GAP_DEG / 2
-      const end = cursor + span - GAP_DEG / 2
-      cursor += span
-      return { ...seg, start, end }
-    })
-  }, [])
+  const arcs = useMemo(() => makePie(BOOK_MONEY_DATA), [])
 
-  const bubbles = useMemo(() => {
-    const map: Record<string, Array<{ x: number; y: number; r: number }>> = {}
-    for (const s of segs) map[s.key] = packBubbles(s.start, s.end, s.pct)
-    return map
-  }, [segs])
+  const packedBySlice = useMemo(() =>
+    arcs.map(d => packSlice(d.data, d)),
+  [arcs])
 
-  const activeSeg = segs.find(s => s.key === active)!
+  const activeSlice = BOOK_MONEY_DATA.find(s => s.id === activeId)!
 
   return (
     <div className="flex flex-col gap-4">
       {/* Chart */}
       <div className="flex justify-center">
-        <svg
-          viewBox="0 0 280 280"
-          className="w-full max-w-[260px]"
-          aria-label="Répartition du prix d'un livre à 20 €"
-        >
+        <svg viewBox={`0 0 ${W} ${H}`} className="w-full max-w-[260px]">
           <defs>
-            {segs.map(s => (
-              <clipPath key={s.key} id={`clip-bmc-${s.key}`}>
-                <path d={donutPath(OUTER_R + 2, INNER_R, s.start, s.end)} />
+            {arcs.map(d => (
+              <clipPath key={d.data.id} id={`clip-${d.data.id}`}>
+                <path d={makeArc(d) ?? ''} />
               </clipPath>
             ))}
           </defs>
 
-          {/* Sector backgrounds */}
-          {segs.map(s => (
-            <path
-              key={s.key}
-              d={donutPath(OUTER_R, INNER_R, s.start, s.end)}
-              fill={s.color}
-              fillOpacity={active === s.key ? 0.22 : 0.10}
-              className="cursor-pointer transition-[fill-opacity] duration-200"
-              onClick={() => setActive(s.key)}
-            />
-          ))}
+          {arcs.map((d, si) => {
+            const isActive = d.data.id === activeId
+            const midAngle = (d.startAngle + d.endAngle) / 2 - Math.PI / 2
+            const centroidR = (INNER_R + OUTER_R) / 2
+            const cx = Math.cos(midAngle) * centroidR + CX
+            const cy = Math.sin(midAngle) * centroidR + CY
 
-          {/* Bubbles clipped to each sector */}
-          {segs.map(s =>
-            bubbles[s.key].map((b, i) => (
-              <circle
-                key={`${s.key}-${i}`}
-                cx={b.x}
-                cy={b.y}
-                r={b.r}
-                fill={s.color}
-                fillOpacity={active === s.key ? 0.9 : 0.42}
-                clipPath={`url(#clip-bmc-${s.key})`}
-                className="cursor-pointer transition-[fill-opacity] duration-200"
-                onClick={() => setActive(s.key)}
-              />
-            ))
-          )}
+            // Push active slice outward slightly
+            const offset = isActive ? 6 : 0
+            const tx = Math.cos(midAngle) * offset
+            const ty = Math.sin(midAngle) * offset
 
-          {/* Center hole */}
+            return (
+              <g
+                key={d.data.id}
+                className="cursor-pointer"
+                style={{
+                  transform: `translate(${tx}px, ${ty}px)`,
+                  transition: 'transform 0.25s ease, opacity 0.25s ease',
+                  opacity: isActive ? 1 : 0.45,
+                }}
+                onClick={() => setActiveId(d.data.id)}
+              >
+                {/* Sector background */}
+                <path
+                  d={makeArc(d) ?? ''}
+                  fill={d.data.color}
+                  fillOpacity={0.15}
+                />
+
+                {/* Packed circles clipped to sector */}
+                <g
+                  clipPath={`url(#clip-${d.data.id})`}
+                  transform={`translate(${cx}, ${cy})`}
+                >
+                  {packedBySlice[si].map((node, ci) => (
+                    <circle
+                      key={`${d.data.id}-${ci}`}
+                      cx={node.x}
+                      cy={node.y}
+                      r={node.r}
+                      fill={d.data.color}
+                      fillOpacity={0.85}
+                      className="circle-fade-in"
+                      style={{
+                        animationDelay: `${si * 60 + ci * 20}ms`,
+                        animationDuration: '400ms',
+                      }}
+                    />
+                  ))}
+                </g>
+              </g>
+            )
+          })}
+
+          {/* Centre hole */}
           <circle
-            cx={CX} cy={CY} r={INNER_R - 1}
-            className="fill-[#FAFAFA] dark:fill-[#0F0F0E]"
+            cx={CX} cy={CY} r={INNER_R - 2}
+            className="fill-[#FAFAFA] dark:fill-[#0F0F0E] pointer-events-none"
           />
 
-          {/* Center text: amount */}
+          {/* Centre text */}
           <text
-            x={CX} y={CY - 6}
+            x={CX} y={CY - 7}
             textAnchor="middle"
-            fill={activeSeg.color}
+            fill={activeSlice.color}
             fontSize="13"
             fontWeight="700"
             fontFamily="system-ui,-apple-system,sans-serif"
             className="pointer-events-none select-none"
           >
-            {activeSeg.amountStr}
+            ~{activeSlice.euros.toFixed(2).replace('.', ',')} €
           </text>
-          {/* Center text: label */}
           <text
             x={CX} y={CY + 9}
             textAnchor="middle"
@@ -204,35 +152,50 @@ export function BookMoneyChart() {
             fontFamily="system-ui,-apple-system,sans-serif"
             className="pointer-events-none select-none fill-[#6B6B68] dark:fill-[#9B9B97]"
           >
-            {activeSeg.label}
+            {activeSlice.label}
           </text>
         </svg>
       </div>
 
       {/* Legend */}
       <div className="flex flex-wrap justify-center gap-x-3 gap-y-2">
-        {segs.map(s => (
+        {BOOK_MONEY_DATA.map(s => (
           <button
-            key={s.key}
+            key={s.id}
             type="button"
-            onClick={() => setActive(s.key)}
-            className={`flex flex-col items-center transition-opacity duration-150 ${active === s.key ? 'opacity-100' : 'opacity-45'}`}
+            onClick={() => setActiveId(s.id)}
+            className={`flex flex-col items-center transition-opacity duration-150 ${activeId === s.id ? 'opacity-100' : 'opacity-45'}`}
           >
             <div className="flex items-center gap-1">
               <span className="h-2 w-2 rounded-full" style={{ background: s.color }} />
-              <span className="text-xs font-bold text-ink dark:text-white">{s.pct}%</span>
+              <span className="text-xs font-bold text-ink dark:text-white">{Math.round(s.pct * 100)}%</span>
             </div>
             <span className="text-[10px] text-muted dark:text-subtle">{s.label}</span>
           </button>
         ))}
       </div>
 
-      {/* Active segment info */}
+      {/* Active slice detail */}
       <div className="rounded-xl border border-[#E5E5E3] px-4 py-3 dark:border-[#2A2A28]">
         <p className="text-sm font-bold text-ink dark:text-white">
-          {activeSeg.label} — {activeSeg.amountStr}
+          {activeSlice.label} — ~{activeSlice.euros.toFixed(2).replace('.', ',')} €
         </p>
-        <p className="mt-0.5 text-xs text-muted dark:text-subtle">{activeSeg.note}</p>
+        <p className="mt-0.5 text-xs text-muted dark:text-subtle">{activeSlice.detail}</p>
+
+        {/* Named actors (skip uniform-weight lists like auteur) */}
+        {activeSlice.actors.some(a => a.label) && (
+          <div className="mt-2 flex flex-wrap gap-1.5">
+            {activeSlice.actors.filter(a => a.label).map(a => (
+              <span
+                key={a.id}
+                className="rounded-md px-1.5 py-0.5 text-[10px] font-medium"
+                style={{ background: activeSlice.color + '22', color: activeSlice.color }}
+              >
+                {a.label}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
     </div>
   )
