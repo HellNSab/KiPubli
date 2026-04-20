@@ -53,14 +53,14 @@ const activeSlice = BOOK_MONEY_DATA.find(s => s.id === activeId) ?? null
                   style={{
                     transform: `translate(${tx}px, ${ty}px)`,
                     transition: 'transform 0.25s ease, opacity 0.25s ease',
-                    opacity: hasActive && !isActive ? 0.45 : 1,
+                    opacity: hasActive && !isActive ? 0.75 : 1,
                   }}
                   onClick={() => setActiveId(d.data.id)}
                 >
                   <path
                     d={makeArc(d) ?? ''}
                     fill={d.data.color}
-                    fillOpacity={0.15}
+                    fillOpacity={isActive ? 0.8 : 0.6}
                   />
                 </g>
               )
