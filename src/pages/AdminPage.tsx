@@ -199,7 +199,7 @@ function SelectWrap({ className, children, ...props }: React.SelectHTMLAttribute
 // ── Group form ────────────────────────────────────────────────
 
 function GroupForm({ groups, initialData, onSaveStart, onSaved, onSaveError, onClose }: { groups: Group[]; initialData?: Group; onSaveStart?: () => void; onSaved: () => void; onSaveError?: () => void; onClose: () => void }) {
-  const empty: Group = { id: '', name: '', owner: '', listed: false, note: '', wikipedia_url: '' }
+  const empty: Group = { id: '', name: '', owner: '', listed: false, note: '', wikipedia_url: '', distributeur: '', distributeur_owner: '', diffuseur: '', diffuseur_owner: '' }
   const [form, setForm] = useState<Group>(initialData ?? empty)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -245,6 +245,22 @@ function GroupForm({ groups, initialData, onSaveStart, onSaved, onSaveError, onC
         <Field label="Wikipedia" hint="(optionnel)">
           <input className={inputCls} value={form.wikipedia_url ?? ''} onChange={e => set('wikipedia_url', e.target.value)} placeholder="https://fr.wikipedia.org/wiki/…" />
         </Field>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Distributeur">
+            <input className={inputCls} value={form.distributeur ?? ''} onChange={e => set('distributeur', e.target.value)} placeholder="Hachette Distribution" />
+          </Field>
+          <Field label="Propriétaire distributeur">
+            <input className={inputCls} value={form.distributeur_owner ?? ''} onChange={e => set('distributeur_owner', e.target.value)} placeholder="Lagardère / LVMH" />
+          </Field>
+        </div>
+        <div className="grid grid-cols-2 gap-4">
+          <Field label="Diffuseur">
+            <input className={inputCls} value={form.diffuseur ?? ''} onChange={e => set('diffuseur', e.target.value)} placeholder="Volumen" />
+          </Field>
+          <Field label="Propriétaire diffuseur">
+            <input className={inputCls} value={form.diffuseur_owner ?? ''} onChange={e => set('diffuseur_owner', e.target.value)} placeholder="Média-Participations / Famille Lombard" />
+          </Field>
+        </div>
         <div className="flex items-center gap-3">
           <input
             type="checkbox"
@@ -661,6 +677,8 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Propriétaire</th>
                       <th className="w-24 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Coté</th>
                       <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Note</th>
+                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Distributeur</th>
+                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Diffuseur</th>
                       <th className="w-20 px-4 py-2.5"></th>
                     </tr>
                   </thead>
@@ -691,6 +709,22 @@ export function AdminPage({ onNavigateToApp }: Props) {
                           </td>
                           <td className="max-w-xs truncate px-4 py-3.5 text-xs text-gray-400">
                             {g.note}
+                          </td>
+                          <td className="px-4 py-3.5">
+                            {g.distributeur ? (
+                              <div>
+                                <div className="text-xs text-gray-300">{g.distributeur}</div>
+                                <div className="text-xs text-gray-500">{g.distributeur_owner}</div>
+                              </div>
+                            ) : <span className="text-gray-600">—</span>}
+                          </td>
+                          <td className="px-4 py-3.5">
+                            {g.diffuseur ? (
+                              <div>
+                                <div className="text-xs text-gray-300">{g.diffuseur}</div>
+                                <div className="text-xs text-gray-500">{g.diffuseur_owner}</div>
+                              </div>
+                            ) : <span className="text-gray-600">—</span>}
                           </td>
                           <td className="px-4 py-3.5">
                             <div className="flex items-center justify-end gap-1">

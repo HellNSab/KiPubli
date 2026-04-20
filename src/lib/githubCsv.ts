@@ -59,7 +59,7 @@ function serializeCSV(headers: string[], rows: Record<string, string>[]): string
 // ── Groups ────────────────────────────────────────────────────
 
 const GROUPS_PATH = 'public/data/groups.csv'
-const GROUPS_HEADERS = ['id', 'name', 'owner', 'listed', 'note', 'wikipedia_url']
+const GROUPS_HEADERS = ['id', 'name', 'owner', 'listed', 'note', 'wikipedia_url', 'distributeur', 'distributeur_owner', 'diffuseur', 'diffuseur_owner']
 
 function groupToRow(g: Group): Record<string, string> {
   return {
@@ -69,6 +69,10 @@ function groupToRow(g: Group): Record<string, string> {
     listed: g.listed ? 'true' : 'false',
     note: g.note,
     wikipedia_url: g.wikipedia_url ?? '',
+    distributeur: g.distributeur ?? '',
+    distributeur_owner: g.distributeur_owner ?? '',
+    diffuseur: g.diffuseur ?? '',
+    diffuseur_owner: g.diffuseur_owner ?? '',
   }
 }
 

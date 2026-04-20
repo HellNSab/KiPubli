@@ -77,6 +77,10 @@ export function loadGroups(): Promise<Group[]> {
           listed: row.listed === 'true',
           note: row.note,
           wikipedia_url: row.wikipedia_url || undefined,
+          distributeur: row.distributeur || undefined,
+          distributeur_owner: row.distributeur_owner || undefined,
+          diffuseur: row.diffuseur || undefined,
+          diffuseur_owner: row.diffuseur_owner || undefined,
         }))
       )
   }

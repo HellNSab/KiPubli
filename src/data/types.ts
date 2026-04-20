@@ -9,6 +9,10 @@ export type Group = {
   listed: boolean
   note: string
   wikipedia_url?: string
+  distributeur?: string
+  distributeur_owner?: string
+  diffuseur?: string
+  diffuseur_owner?: string
 }
 
 export type Publisher = {
