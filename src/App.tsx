@@ -182,7 +182,7 @@ function App() {
               <button
                 type="button"
                 onClick={() => setShowScanner(true)}
-                className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ink py-4 text-base font-semibold text-white transition-colors hover:bg-[#2A2A28] dark:bg-white dark:text-ink dark:hover:bg-stone-100"
+                className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#E5E5E3] bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
               >
                 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                   <rect x="3" y="3" width="4" height="18" rx="1"/>
