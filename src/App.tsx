@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Scanner } from './components/Scanner'
 import { ResultCard } from './components/ResultCard'
 import { InstallPrompt } from './components/InstallPrompt'
+import { BookMoneyChart } from './components/BookMoneyChart'
 import { AdminPage } from './pages/AdminPage'
 import { fetchBookByIsbn, type BookMetadata } from './lib/googleBooks'
 import { matchPublisher } from './lib/matchPublisher'
@@ -43,6 +44,7 @@ function App() {
     window.location.hash === '#admin' ? 'admin' : 'app'
   )
   const [view, setView] = useState<View>('home')
+  const [showScanner, setShowScanner] = useState(false)
   const [status, setStatus] = useState<Status>({ kind: 'idle' })
   const [recentResults, setRecentResults] = useState<ScanResult[]>(loadRecents)
   const [viewedResult, setViewedResult] = useState<ScanResult | null>(null)
@@ -123,9 +125,47 @@ function App() {
   }
 
   // ── Home view ────────────────────────────────────────────────
+
+  // Scanner sub-view
+  if (showScanner) {
+    return (
+      <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
+        <button
+          type="button"
+          onClick={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
+          className="mb-6 flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-ink dark:text-subtle dark:hover:text-white"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          Retour
+        </button>
+
+        <main className="flex flex-1 flex-col gap-4">
+          <Scanner onDetected={handleIsbn} processing={status.kind === 'processing'} autoStart />
+
+          {status.kind === 'error' && (
+            <div className="flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
+              <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
+              <button
+                type="button"
+                onClick={() => setStatus({ kind: 'idle' })}
+                aria-label="Fermer"
+                className="ml-3 shrink-0 text-red-400 hover:text-red-600"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+        </main>
+      </div>
+    )
+  }
+
+  // Chart home view
   return (
     <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
-      <header className="mb-6 flex items-center gap-3">
+      <header className="mb-5 flex items-center gap-3">
         <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
           <rect width="80" height="80" rx="20" fill="#4F46E5"/>
           <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
@@ -139,26 +179,39 @@ function App() {
           <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-ink dark:text-white">
             À qui ?
           </h1>
-          <p className="text-xs text-muted dark:text-subtle">Transparence éditoriale</p>
+          <p className="text-xs text-muted dark:text-subtle">Où va l'argent d'un livre à 20 €</p>
         </div>
       </header>
 
       <main className="flex flex-1 flex-col gap-5">
-        <Scanner onDetected={handleIsbn} processing={status.kind === 'processing'} />
+        <BookMoneyChart />
 
-        {status.kind === 'error' && (
-          <div className="flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
-            <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
-            <button
-              type="button"
-              onClick={() => setStatus({ kind: 'idle' })}
-              aria-label="Fermer"
-              className="ml-3 shrink-0 text-red-400 hover:text-red-600"
-            >
-              ✕
-            </button>
-          </div>
-        )}
+        <div className="flex flex-col gap-3">
+          <hr className="border-[#E5E5E3] dark:border-[#2A2A28]" />
+
+          {/* Scanner CTA */}
+          <button
+            type="button"
+            onClick={() => setShowScanner(true)}
+            className="flex w-full items-center justify-center gap-2.5 rounded-2xl bg-ink py-4 text-base font-semibold text-white transition-colors hover:bg-[#2A2A28] dark:bg-white dark:text-ink dark:hover:bg-stone-100"
+          >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+              <rect x="3" y="3" width="4" height="18" rx="1"/>
+              <rect x="9" y="3" width="2" height="18" rx="0.5"/>
+              <rect x="13" y="3" width="3" height="18" rx="0.5"/>
+              <rect x="18" y="3" width="3" height="18" rx="1"/>
+            </svg>
+            Scanner un livre
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowScanner(true)}
+            className="text-center text-sm font-medium text-accent dark:text-accent-light"
+          >
+            En savoir plus sur la chaîne du livre →
+          </button>
+        </div>
 
         {recentResults.length > 0 && (
           <section className="flex flex-col gap-3">

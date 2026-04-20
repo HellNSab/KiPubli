@@ -5,6 +5,7 @@ import { isValidIsbn, normalizeIsbn } from '../lib/isbn'
 type Props = {
   onDetected: (isbn: string) => void
   processing: boolean
+  autoStart?: boolean
 }
 
 type Mode = 'idle' | 'live' | 'fallback'
@@ -13,8 +14,8 @@ const LIVE_ID = 'kipubli-scanner-live'
 const FILE_ID = 'kipubli-scanner-file'
 const FALLBACK_DELAY_MS = 5_000
 
-export function Scanner({ onDetected, processing }: Props) {
-  const [mode, setMode] = useState<Mode>('idle')
+export function Scanner({ onDetected, processing, autoStart }: Props) {
+  const [mode, setMode] = useState<Mode>(() => autoStart ? 'live' : 'idle')
   const [decoding, setDecoding] = useState(false)
   const [fileError, setFileError] = useState<string | null>(null)
   const [manual, setManual] = useState('')
