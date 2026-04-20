@@ -1,41 +1,39 @@
 id,name,name_variants,country,founded_year,group_id
-hachette,Hachette Livre,Hachette|Hachette Livre|Hachette Romans|Hachette Éducation,FR,,lagardere
-grasset,Grasset,Grasset|Éditions Grasset|Grasset & Fasquelle,FR,,lagardere
-fayard,Fayard,Fayard|Éditions Fayard,FR,,lagardere
-stock,Stock,Stock|Éditions Stock,FR,,lagardere
-calmann-levy,Calmann-Lévy,Calmann-Lévy|Calmann Levy,FR,,lagardere
-jclattes,JC Lattès,JC Lattès|Jean-Claude Lattès|J.-C. Lattès,FR,,lagardere
-lgf,Le Livre de Poche,Le Livre de Poche|LGF|Librairie Générale Française,FR,,lagardere
-larousse,Larousse,Larousse|Éditions Larousse,FR,,lagardere
-marabout,Marabout,Marabout,FR,,lagardere
-arenes,Les Arènes,Les Arènes|Éditions des Arènes,FR,,lagardere
-laffont,Robert Laffont,Robert Laffont|Éditions Robert Laffont,FR,,editis
-plon,Plon,Plon|Éditions Plon,FR,,editis
-julliard,Julliard,Julliard|Éditions Julliard,FR,,editis
-10-18,10/18,10/18|10-18|Éditions 10/18,FR,,editis
-pocket,Pocket,Pocket|Pocket Jeunesse,FR,,editis
-nathan,Nathan,Nathan|Éditions Nathan,FR,,editis
-bordas,Bordas,Bordas|Éditions Bordas,FR,,editis
-cherche-midi,Le Cherche Midi,Le Cherche Midi|Cherche Midi,FR,,editis
-belfond,Belfond,Belfond|Éditions Belfond,FR,,editis
-xo,XO Éditions,XO|XO Éditions,FR,,editis
-gallimard,Gallimard,Gallimard|Éditions Gallimard|Gallimard Jeunesse,FR,,madrigall
-folio,Folio,Folio|Gallimard Folio,FR,,madrigall
-pleiade,La Pléiade,La Pléiade|Bibliothèque de la Pléiade|Pléiade,FR,,madrigall
-flammarion,Flammarion,Flammarion|Éditions Flammarion|Flammarion Jeunesse,FR,,madrigall
-casterman,Casterman,Casterman|Éditions Casterman,FR,,madrigall
-autrement,Autrement,Autrement|Éditions Autrement,FR,,madrigall
-denoel,Denoël,Denoël|Éditions Denoël|Denoel,FR,,madrigall
-mercure,Mercure de France,Mercure de France,FR,,madrigall
-pol,P.O.L,P.O.L|POL|Éditions P.O.L,FR,,madrigall
-seuil,Le Seuil,Le Seuil|Éditions du Seuil|Seuil|Editions du Seuil,FR,,media-participations
-martiniere,La Martinière,La Martinière|Éditions de la Martinière|Martinière,FR,,media-participations
-points,Points,Points|Éditions Points,FR,,media-participations
-dargaud,Dargaud,Dargaud|Éditions Dargaud,BE,,media-participations
-dupuis,Dupuis,Dupuis|Éditions Dupuis,BE,,media-participations
-lombard,Le Lombard,Le Lombard|Éditions du Lombard,BE,,media-participations
-actes-sud-pub,Actes Sud,Actes Sud|Éditions Actes Sud|Actes Sud Jeunesse,FR,,actes-sud
-albin-michel-pub,Albin Michel,Albin Michel|Éditions Albin Michel|Albin Michel Jeunesse,FR,,albin-michel
-belin,Belin,Belin|Éditions Belin|Belin Éducation,FR,,humensis
-puf,PUF,PUF|Presses universitaires de France|Presses Universitaires de France,FR,,humensis
-robert,Le Robert,Le Robert|Éditions Le Robert|Dictionnaires Le Robert,FR,,humensis
+gallimard,Gallimard,"Gallimard|Éditions Gallimard|NRF|Nouvelle Revue Française",FR,1911,madrigall
+folio,Folio,"Folio|Gallimard Folio|Collection Folio",FR,,madrigall
+pleiade,La Pléiade,"La Pléiade|Bibliothèque de la Pléiade|Pléiade",FR,1931,madrigall
+flammarion,Flammarion,"Flammarion|Éditions Flammarion|J'ai lu Flammarion",FR,1875,madrigall
+casterman,Casterman,"Casterman|Éditions Casterman",BE,1780,madrigall
+autrement,Autrement,"Autrement|Éditions Autrement",FR,1975,madrigall
+decouverte,La Découverte,"La Découverte|Éditions La Découverte|Maspero",FR,1959,madrigall
+seuil,Le Seuil,"Le Seuil|Éditions du Seuil|Seuil|Éd. du Seuil",FR,1935,media-participations
+la-martiniere,La Martinière,"La Martinière|Éditions de La Martinière|Éd. de la Martinière",FR,1990,media-participations
+jc-lattes,JC Lattès,"JC Lattès|Lattès|Jean-Claude Lattès",FR,1968,media-participations
+stock,Stock,"Stock|Éditions Stock|Le Livre de Poche Stock",FR,1708,lagardere
+hachette,Hachette Livre,"Hachette|Hachette Livre|Hachette Jeunesse",FR,1826,lagardere
+grasset,Grasset,"Grasset|Éditions Grasset|Bernard Grasset|Grasset & Fasquelle",FR,1907,lagardere
+fayard,Fayard,"Fayard|Éditions Fayard",FR,1857,lagardere
+calmann-levy,Calmann-Lévy,"Calmann-Lévy|Calmann Lévy|Calmann-Levy",FR,1836,lagardere
+lgf,Le Livre de Poche,"Livre de Poche|LGF|Le Livre de Poche|LGF/Le Livre de Poche",FR,1953,lagardere
+marabout,Marabout,"Marabout|Éditions Marabout",BE,1949,lagardere
+larousse,Larousse,"Larousse|Éditions Larousse",FR,1852,lagardere
+hatier,Hatier,"Hatier|Éditions Hatier",FR,1880,lagardere
+laffont,Robert Laffont,"Robert Laffont|Laffont|R. Laffont|Éditions Robert Laffont",FR,1941,editis
+plon,Plon,"Plon|Éditions Plon",FR,1852,editis
+julliard,Julliard,"Julliard|Éditions Julliard",FR,1944,editis
+pocket,Pocket,"Pocket|Éditions Pocket",FR,1962,editis
+10-18,10/18,"10/18|Dix-Dix-Huit|Éditions 10/18",FR,1962,editis
+presses-cite,Presses de la Cité,"Presses de la Cité|Press de la Cité",FR,1947,editis
+bordas,Bordas,"Bordas|Éditions Bordas",FR,1946,editis
+le-robert,Le Robert,"Le Robert|Dictionnaires Le Robert|Robert",FR,1967,editis
+belfond,Belfond,"Belfond|Éditions Belfond",FR,1963,editis
+xo-editions,XO Éditions,"XO|XO Éditions|Éditions XO",FR,2000,editis
+actes-sud-pub,Actes Sud,"Actes Sud|Éditions Actes Sud|Éd. Actes Sud",FR,1978,actes-sud
+babel,Babel,"Babel|Actes Sud Babel|Collection Babel",FR,,actes-sud
+arles,Rouergue,"Rouergue|Éditions du Rouergue",FR,1989,actes-sud
+albin,Albin Michel,"Albin Michel|Éditions Albin Michel|Éd. Albin Michel",FR,1900,albin-michel
+lgf-albin,Livre de Poche Albin,"Albin Michel Poche",FR,,albin-michel
+belin,Belin,"Belin|Éditions Belin|Éd. Belin",FR,1777,humensis
+puf,PUF,"PUF|Presses Universitaires de France|P.U.F.",FR,1921,humensis
+armand-colin,Armand Colin,"Armand Colin|Éditions Armand Colin",FR,1870,humensis
+dalloz,Dalloz,"Dalloz|Éditions Dalloz",FR,1845,humensis
