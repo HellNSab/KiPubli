@@ -369,12 +369,10 @@ type DeployPhase = 'idle' | 'saving' | 'deploying' | 'live' | 'error'
 
 function DeployToast({
   phase,
-  runUrl,
   onDismiss,
   onRetry,
 }: {
   phase: DeployPhase
-  runUrl: string
   onDismiss: () => void
   onRetry: () => void
 }) {
@@ -494,7 +492,6 @@ export function AdminPage({ onNavigateToApp }: Props) {
   const [editingGroup, setEditingGroup] = useState<Group | null>(null)
   const [editingPublisher, setEditingPublisher] = useState<Publisher | null>(null)
   const [deployPhase, setDeployPhase] = useState<DeployPhase>('idle')
-  const [deployRunUrl, setDeployRunUrl] = useState('https://github.com/HellNSab/KiPubli/actions')
   const deployAbort = useRef<AbortController | null>(null)
   const deploySince = useRef<Date>(new Date())
 
@@ -517,9 +514,9 @@ export function AdminPage({ onNavigateToApp }: Props) {
       import.meta.env.VITE_GITHUB_TOKEN ?? '',
       since,
       {
-        onQueued: url => setDeployRunUrl(url),
+        onQueued: () => {},
         onSuccess: () => setDeployPhase('live'),
-        onFailure: url => { setDeployRunUrl(url); setDeployPhase('error') },
+        onFailure: () => setDeployPhase('error'),
       },
       ctrl.signal
     )
@@ -870,7 +867,6 @@ export function AdminPage({ onNavigateToApp }: Props) {
 
       <DeployToast
         phase={deployPhase}
-        runUrl={deployRunUrl}
         onDismiss={() => { deployAbort.current?.abort(); setDeployPhase('idle') }}
         onRetry={() => startPolling(deploySince.current)}
       />
