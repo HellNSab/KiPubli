@@ -72,88 +72,88 @@ export function BookMoneyChart() {
             ))}
           </defs>
 
-          {arcs.map((d, si) => {
-            const isActive = d.data.id === activeId
-            const midAngle = (d.startAngle + d.endAngle) / 2 - Math.PI / 2
-            const centroidR = (INNER_R + OUTER_R) / 2
-            const cx = Math.cos(midAngle) * centroidR + CX
-            const cy = Math.sin(midAngle) * centroidR + CY
+          {/* Single translate brings arc origin (0,0) to SVG centre —
+              clipPaths, sector paths and circle groups all share this space */}
+          <g transform={`translate(${CX}, ${CY})`}>
+            {arcs.map((d, si) => {
+              const isActive = d.data.id === activeId
+              const midAngle = (d.startAngle + d.endAngle) / 2 - Math.PI / 2
+              const centroidR = (INNER_R + OUTER_R) / 2
+              // Centroid is relative to the group origin, no +CX/CY needed
+              const cx = Math.cos(midAngle) * centroidR
+              const cy = Math.sin(midAngle) * centroidR
 
-            // Push active slice outward slightly
-            const offset = isActive ? 6 : 0
-            const tx = Math.cos(midAngle) * offset
-            const ty = Math.sin(midAngle) * offset
+              const offset = isActive ? 6 : 0
+              const tx = Math.cos(midAngle) * offset
+              const ty = Math.sin(midAngle) * offset
 
-            return (
-              <g
-                key={d.data.id}
-                className="cursor-pointer"
-                style={{
-                  transform: `translate(${tx}px, ${ty}px)`,
-                  transition: 'transform 0.25s ease, opacity 0.25s ease',
-                  opacity: isActive ? 1 : 0.45,
-                }}
-                onClick={() => setActiveId(d.data.id)}
-              >
-                {/* Sector background */}
-                <path
-                  d={makeArc(d) ?? ''}
-                  fill={d.data.color}
-                  fillOpacity={0.15}
-                />
-
-                {/* Packed circles clipped to sector */}
+              return (
                 <g
-                  clipPath={`url(#clip-${d.data.id})`}
-                  transform={`translate(${cx}, ${cy})`}
+                  key={d.data.id}
+                  className="cursor-pointer"
+                  style={{
+                    transform: `translate(${tx}px, ${ty}px)`,
+                    transition: 'transform 0.25s ease, opacity 0.25s ease',
+                    opacity: isActive ? 1 : 0.45,
+                  }}
+                  onClick={() => setActiveId(d.data.id)}
                 >
-                  {packedBySlice[si].map((node, ci) => (
-                    <circle
-                      key={`${d.data.id}-${ci}`}
-                      cx={node.x}
-                      cy={node.y}
-                      r={node.r}
-                      fill={d.data.color}
-                      fillOpacity={0.85}
-                      className="circle-fade-in"
-                      style={{
-                        animationDelay: `${si * 60 + ci * 20}ms`,
-                        animationDuration: '400ms',
-                      }}
-                    />
-                  ))}
+                  <path
+                    d={makeArc(d) ?? ''}
+                    fill={d.data.color}
+                    fillOpacity={0.15}
+                  />
+
+                  <g
+                    clipPath={`url(#clip-${d.data.id})`}
+                    transform={`translate(${cx}, ${cy})`}
+                  >
+                    {packedBySlice[si].map((node, ci) => (
+                      <circle
+                        key={`${d.data.id}-${ci}`}
+                        cx={node.x}
+                        cy={node.y}
+                        r={node.r}
+                        fill={d.data.color}
+                        fillOpacity={0.85}
+                        className="circle-fade-in"
+                        style={{
+                          animationDelay: `${si * 60 + ci * 20}ms`,
+                          animationDuration: '400ms',
+                        }}
+                      />
+                    ))}
+                  </g>
                 </g>
-              </g>
-            )
-          })}
+              )
+            })}
 
-          {/* Centre hole */}
-          <circle
-            cx={CX} cy={CY} r={INNER_R - 2}
-            className="fill-[#FAFAFA] dark:fill-[#0F0F0E] pointer-events-none"
-          />
-
-          {/* Centre text */}
-          <text
-            x={CX} y={CY - 7}
-            textAnchor="middle"
-            fill={activeSlice.color}
-            fontSize="13"
-            fontWeight="700"
-            fontFamily="system-ui,-apple-system,sans-serif"
-            className="pointer-events-none select-none"
-          >
-            ~{activeSlice.euros.toFixed(2).replace('.', ',')} €
-          </text>
-          <text
-            x={CX} y={CY + 9}
-            textAnchor="middle"
-            fontSize="9.5"
-            fontFamily="system-ui,-apple-system,sans-serif"
-            className="pointer-events-none select-none fill-[#6B6B68] dark:fill-[#9B9B97]"
-          >
-            {activeSlice.label}
-          </text>
+            {/* Centre hole — at (0,0) in the translated group */}
+            <circle
+              cx={0} cy={0} r={INNER_R - 2}
+              className="fill-[#FAFAFA] dark:fill-[#0F0F0E] pointer-events-none"
+            />
+            <text
+              x={0} y={-7}
+              textAnchor="middle"
+              fill={activeSlice.color}
+              fontSize="13"
+              fontWeight="700"
+              fontFamily="system-ui,-apple-system,sans-serif"
+              className="pointer-events-none select-none"
+            >
+              ~{activeSlice.euros.toFixed(2).replace('.', ',')} €
+            </text>
+            <text
+              x={0} y={9}
+              textAnchor="middle"
+              fontSize="9.5"
+              fontFamily="system-ui,-apple-system,sans-serif"
+              className="pointer-events-none select-none fill-[#6B6B68] dark:fill-[#9B9B97]"
+            >
+              {activeSlice.label}
+            </text>
+          </g>
         </svg>
       </div>
 
