@@ -193,13 +193,6 @@ function App() {
                 Scanner un livre
               </button>
 
-              <button
-                type="button"
-                onClick={() => setShowScanner(true)}
-                className="text-center text-sm font-medium text-accent dark:text-accent-light"
-              >
-                En savoir plus sur la chaîne du livre →
-              </button>
             </div>
           </>
         )}
