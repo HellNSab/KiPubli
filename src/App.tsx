@@ -151,7 +151,12 @@ function App() {
       <main className="flex flex-1 flex-col gap-5">
         {showScanner ? (
           <>
-            <Scanner onDetected={handleIsbn} processing={status.kind === 'processing'} autoStart />
+            <Scanner
+              onDetected={handleIsbn}
+              processing={status.kind === 'processing'}
+              autoStart
+              onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
+            />
 
             {status.kind === 'error' && (
               <div className="flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
@@ -166,14 +171,6 @@ function App() {
                 </button>
               </div>
             )}
-
-            <button
-              type="button"
-              onClick={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
-              className="text-center text-sm font-medium text-muted dark:text-subtle"
-            >
-              ← Retour au graphique
-            </button>
           </>
         ) : (
           <>

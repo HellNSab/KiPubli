@@ -6,6 +6,7 @@ type Props = {
   onDetected: (isbn: string) => void
   processing: boolean
   autoStart?: boolean
+  onCancel?: () => void
 }
 
 type Mode = 'idle' | 'live' | 'fallback'
@@ -14,7 +15,7 @@ const LIVE_ID = 'kipubli-scanner-live'
 const FILE_ID = 'kipubli-scanner-file'
 const FALLBACK_DELAY_MS = 5_000
 
-export function Scanner({ onDetected, processing, autoStart }: Props) {
+export function Scanner({ onDetected, processing, autoStart, onCancel }: Props) {
   const [mode, setMode] = useState<Mode>(() => autoStart ? 'live' : 'idle')
   const [decoding, setDecoding] = useState(false)
   const [fileError, setFileError] = useState<string | null>(null)
@@ -180,7 +181,7 @@ export function Scanner({ onDetected, processing, autoStart }: Props) {
       ) : (
         <button
           type="button"
-          onClick={stopScanning}
+          onClick={() => { stopScanning(); onCancel?.() }}
           className="w-full rounded-xl border border-[#E5E5E3] py-4 text-base font-medium text-muted transition-colors hover:bg-stone-50 dark:border-[#2A2A28] dark:text-subtle dark:hover:bg-dark-card"
         >
           Annuler
