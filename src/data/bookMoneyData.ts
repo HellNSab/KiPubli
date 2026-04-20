@@ -68,7 +68,7 @@ export const BOOK_MONEY_DATA: Slice[] = [
   },
   {
     id: 'auteur',
-    label: 'Auteur·e',
+    label: 'Auteur',
     color: '#EC4899',
     euros: 2.00,
     pct: 0.10,
@@ -92,7 +92,7 @@ export const BOOK_MONEY_DATA: Slice[] = [
     color: '#818CF8',
     euros: 1.60,
     pct: 0.08,
-    detail: 'LVMH, CMA CGM, familles indépendantes · c\'est ce qu\'À qui ? révèle',
+    detail: 'Les groupes éditoriaux détiennent plusieurs maisons d\'édition sous une même holding. C\'est à ce niveau que se prennent les décisions stratégiques et financières. Le secteur est fortement concentré.',
     actors: [
       { id: 'lvmh',             label: 'LVMH / Arnault',     weight: 8 },
       { id: 'cmacgm',           label: 'CMA CGM / Saadé',    weight: 7 },
