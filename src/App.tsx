@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Scanner } from './components/Scanner'
 import { ResultCard } from './components/ResultCard'
 import { InstallPrompt } from './components/InstallPrompt'
-import { BookMoneyChart } from './components/BookMoneyChart'
+import { HomeChart } from './components/HomeChart'
 import { AdminPage } from './pages/AdminPage'
 import { fetchBookByIsbn, type BookMetadata } from './lib/googleBooks'
 import { matchPublisher } from './lib/matchPublisher'
@@ -174,7 +174,7 @@ function App() {
           </>
         ) : (
           <>
-            <BookMoneyChart />
+            <HomeChart />
 
             <div className="flex flex-col gap-3">
               <hr className="border-[#E5E5E3] dark:border-[#2A2A28]" />
