@@ -149,52 +149,58 @@ function App() {
       </header>
 
       <main className="flex flex-1 flex-col gap-5">
-        {showScanner ? (
-          <>
-            <Scanner
-              onDetected={handleIsbn}
-              processing={status.kind === 'processing'}
-              autoStart
-              onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
-            />
+        <div
+          key={showScanner ? 'scanner' : 'chart'}
+          className="animate-fade-in"
+        >
+          {showScanner ? (
+            <>
+              <Scanner
+                onDetected={handleIsbn}
+                processing={status.kind === 'processing'}
+                autoStart
+                onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
+              />
 
-            {status.kind === 'error' && (
-              <div className="flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
-                <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
-                <button
-                  type="button"
-                  onClick={() => setStatus({ kind: 'idle' })}
-                  aria-label="Fermer"
-                  className="ml-3 shrink-0 text-red-400 hover:text-red-600"
-                >
-                  ✕
-                </button>
-              </div>
-            )}
-          </>
-        ) : (
-          <>
+              {status.kind === 'error' && (
+                <div className="mt-4 flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
+                  <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
+                  <button
+                    type="button"
+                    onClick={() => setStatus({ kind: 'idle' })}
+                    aria-label="Fermer"
+                    className="ml-3 shrink-0 text-red-400 hover:text-red-600"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )}
+            </>
+          ) : (
             <HomeChart />
+          )}
+        </div>
 
-            <div className="flex flex-col gap-3">
-              <hr className="border-[#E5E5E3] dark:border-[#2A2A28]" />
+        {!showScanner && (
+          <div className="flex flex-col items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setShowScanner(true)}
+              className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#E5E5E3] bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
+            >
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <rect x="3" y="3" width="4" height="18" rx="1"/>
+                <rect x="9" y="3" width="2" height="18" rx="0.5"/>
+                <rect x="13" y="3" width="3" height="18" rx="0.5"/>
+                <rect x="18" y="3" width="3" height="18" rx="1"/>
+              </svg>
+              Scanner un livre
+            </button>
 
-              <button
-                type="button"
-                onClick={() => setShowScanner(true)}
-                className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#E5E5E3] bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
-              >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                  <rect x="3" y="3" width="4" height="18" rx="1"/>
-                  <rect x="9" y="3" width="2" height="18" rx="0.5"/>
-                  <rect x="13" y="3" width="3" height="18" rx="0.5"/>
-                  <rect x="18" y="3" width="3" height="18" rx="1"/>
-                </svg>
-                Scanner un livre
-              </button>
-
-            </div>
-          </>
+            <span className="text-sm font-medium text-accent cursor-default">
+              En savoir plus sur la chaîne du livre →
+            </span>
+          </div>
         )}
 
         {!showScanner && recentResults.length > 0 && (
