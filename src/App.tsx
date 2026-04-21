@@ -3,13 +3,14 @@ import { Scanner } from './components/Scanner'
 import { ResultCard } from './components/ResultCard'
 import { InstallPrompt } from './components/InstallPrompt'
 import { HomeChart } from './components/HomeChart'
+import { ChainExplainer } from './components/ChainExplainer'
 import { AdminPage } from './pages/AdminPage'
 import { fetchBookByIsbn, type BookMetadata } from './lib/googleBooks'
 import { matchPublisher } from './lib/matchPublisher'
 import { getOwnershipChain } from './data/repository'
 import type { OwnershipChain } from './data/types'
 
-type View = 'home' | 'result'
+type View = 'home' | 'learn' | 'result'
 
 type Status =
   | { kind: 'idle' }
@@ -125,6 +126,35 @@ function App() {
     )
   }
 
+  // ── Learn view ───────────────────────────────────────────────
+  if (view === 'learn') {
+    return (
+      <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6 animate-fade-in">
+        <header className="mb-5 flex items-center gap-3">
+          <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
+            <rect width="80" height="80" rx="20" fill="#4F46E5"/>
+            <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
+            <rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/>
+            <rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/>
+            <rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/>
+            <circle cx="62" cy="60" r="6" fill="white"/>
+            <circle cx="62" cy="60" r="3" fill="#4F46E5"/>
+          </svg>
+          <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-ink dark:text-white">
+            À qui ?
+          </h1>
+        </header>
+
+        <main className="flex flex-1 flex-col">
+          <ChainExplainer
+            onScan={() => { setView('home'); setShowScanner(true) }}
+            onSkip={() => setView('home')}
+          />
+        </main>
+      </div>
+    )
+  }
+
   // ── Home view ────────────────────────────────────────────────
   return (
     <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
@@ -197,9 +227,13 @@ function App() {
               Scanner un livre
             </button>
 
-            <span className="text-sm font-medium text-accent cursor-default">
+            <button
+              type="button"
+              onClick={() => setView('learn')}
+              className="text-sm font-medium text-accent hover:underline"
+            >
               En savoir plus sur la chaîne du livre →
-            </span>
+            </button>
           </div>
         )}
 
