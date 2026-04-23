@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Scanner } from './components/Scanner'
 import { ResultCard } from './components/ResultCard'
 import { InstallPrompt } from './components/InstallPrompt'
@@ -56,6 +56,25 @@ function App() {
     return () => window.removeEventListener('hashchange', onHashChange)
   }, [])
 
+  // viewRef lets the popstate listener read current view without a stale closure
+  const viewRef = useRef<View>(view)
+  useEffect(() => { viewRef.current = view }, [view])
+
+  // Seed initial history entry and handle Android hardware back button
+  useEffect(() => {
+    window.history.replaceState({ view: 'home', showScanner: false }, '')
+
+    function onPopState(e: PopStateEvent) {
+      const state = e.state as { view: View; showScanner: boolean } | null
+      if (!state) return
+      setView(state.view)
+      setShowScanner(state.showScanner)
+      setStatus({ kind: 'idle' })
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
+
   if (page === 'admin') {
     return (
       <AdminPage
@@ -89,6 +108,7 @@ function App() {
       setStatus({ kind: 'idle' })
       setShowScanner(false)
       setView('result')
+      window.history.replaceState({ view: 'result', showScanner: false }, '')
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur inconnue'
       setStatus({ kind: 'error', message: `Échec de la recherche : ${message}` })
@@ -98,6 +118,7 @@ function App() {
   function openResult(result: ScanResult) {
     setViewedResult(result)
     setView('result')
+    window.history.pushState({ view: 'result', showScanner: false }, '')
   }
 
   // ── Result view ──────────────────────────────────────────────
@@ -106,7 +127,7 @@ function App() {
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
         <button
           type="button"
-          onClick={() => setView('home')}
+          onClick={() => { setView('home'); setShowScanner(false); window.history.back() }}
           className="mb-6 flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-ink dark:text-subtle dark:hover:text-white"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -147,8 +168,12 @@ function App() {
 
         <main className="flex flex-1 flex-col">
           <ChainExplainer
-            onScan={() => { setView('home'); setShowScanner(true) }}
-            onSkip={() => setView('home')}
+            onScan={() => {
+              setView('home')
+              setShowScanner(true)
+              window.history.replaceState({ view: 'home', showScanner: true }, '')
+            }}
+            onSkip={() => { setView('home'); window.history.back() }}
           />
         </main>
       </div>
@@ -191,7 +216,7 @@ function App() {
               onDetected={handleIsbn}
               processing={status.kind === 'processing'}
               active={showScanner}
-              onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
+              onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }); window.history.back() }}
             />
 
             {status.kind === 'error' && (
@@ -214,7 +239,7 @@ function App() {
           <div className="flex flex-col items-center gap-3">
             <button
               type="button"
-              onClick={() => setShowScanner(true)}
+              onClick={() => { setShowScanner(true); window.history.pushState({ view: 'home', showScanner: true }, '') }}
               className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#E5E5E3] bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
             >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -228,7 +253,7 @@ function App() {
 
             <button
               type="button"
-              onClick={() => setView('learn')}
+              onClick={() => { setView('learn'); window.history.pushState({ view: 'learn', showScanner: false }, '') }}
               className="text-sm font-medium text-accent hover:underline"
             >
               En savoir plus sur la chaîne du livre →
