@@ -67,8 +67,7 @@ function App() {
     function onPopState(e: PopStateEvent) {
       const state = e.state as { view: View; showScanner: boolean } | null
       if (!state) return
-      setView(state.view)
-      setShowScanner(state.showScanner)
+      navigateTo(state.view, { showScanner: state.showScanner, noHistory: true })
       setStatus({ kind: 'idle' })
     }
     window.addEventListener('popstate', onPopState)
@@ -106,9 +105,7 @@ function App() {
       addToRecents(result)
       setViewedResult(result)
       setStatus({ kind: 'idle' })
-      setShowScanner(false)
-      setView('result')
-      window.history.replaceState({ view: 'result', showScanner: false }, '')
+      navigateTo('result', { replace: true })
     } catch (err) {
       const message = err instanceof Error ? err.message : 'Erreur inconnue'
       setStatus({ kind: 'error', message: `Échec de la recherche : ${message}` })
@@ -117,8 +114,24 @@ function App() {
 
   function openResult(result: ScanResult) {
     setViewedResult(result)
-    setView('result')
-    window.history.pushState({ view: 'result', showScanner: false }, '')
+    navigateTo('result')
+  }
+
+  // Central navigation helper — always use this instead of calling setView directly.
+  // Order: history op → scroll reset → setState.
+  function navigateTo(target: View, opts: { showScanner?: boolean; replace?: boolean; noHistory?: boolean } = {}) {
+    const nextScanner = opts.showScanner ?? false
+    if (!opts.noHistory) {
+      const state = { view: target, showScanner: nextScanner }
+      if (opts.replace) {
+        window.history.replaceState(state, '')
+      } else {
+        window.history.pushState(state, '')
+      }
+    }
+    window.scrollTo(0, 0)
+    setView(target)
+    setShowScanner(nextScanner)
   }
 
   // ── Result view ──────────────────────────────────────────────
@@ -127,7 +140,7 @@ function App() {
       <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
         <button
           type="button"
-          onClick={() => { setView('home'); setShowScanner(false); window.history.back() }}
+          onClick={() => { navigateTo('home', { noHistory: true }); window.history.back() }}
           className="mb-6 flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-ink dark:text-subtle dark:hover:text-white"
         >
           <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -168,12 +181,8 @@ function App() {
 
         <main className="flex flex-1 flex-col">
           <ChainExplainer
-            onScan={() => {
-              setView('home')
-              setShowScanner(true)
-              window.history.replaceState({ view: 'home', showScanner: true }, '')
-            }}
-            onSkip={() => { setView('home'); window.history.back() }}
+            onScan={() => navigateTo('home', { showScanner: true, replace: true })}
+            onSkip={() => { navigateTo('home', { noHistory: true }); window.history.back() }}
           />
         </main>
       </div>
@@ -253,7 +262,7 @@ function App() {
 
             <button
               type="button"
-              onClick={() => { setView('learn'); window.history.pushState({ view: 'learn', showScanner: false }, '') }}
+              onClick={() => navigateTo('learn')}
               className="text-sm font-medium text-accent hover:underline"
             >
               En savoir plus sur la chaîne du livre →
