@@ -49,6 +49,29 @@ body {
   animation: fade-in 0.25s ease both;
 }
 
+/* Panel swap transition (chart ↔ scanner) */
+.panel-swap-grid { display: grid; }
+.panel-swap-grid > * { grid-area: 1 / 1; min-width: 0; }
+
+.panel-in {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+  transition: opacity 0.45s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+.panel-out-up {
+  opacity: 0;
+  transform: translateY(-22px);
+  pointer-events: none;
+  transition: opacity 0.45s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+.panel-out-down {
+  opacity: 0;
+  transform: translateY(22px);
+  pointer-events: none;
+  transition: opacity 0.45s cubic-bezier(0.4,0,0.2,1), transform 0.45s cubic-bezier(0.4,0,0.2,1);
+}
+
 /* Normalise html5-qrcode live-scan container so video fills the viewfinder */
 #kipubli-scanner-live,
 #kipubli-scanner-live > div {

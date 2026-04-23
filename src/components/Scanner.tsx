@@ -6,6 +6,7 @@ type Props = {
   onDetected: (isbn: string) => void
   processing: boolean
   autoStart?: boolean
+  active?: boolean
   onCancel?: () => void
 }
 
@@ -15,7 +16,7 @@ const LIVE_ID = 'kipubli-scanner-live'
 const FILE_ID = 'kipubli-scanner-file'
 const FALLBACK_DELAY_MS = 5_000
 
-export function Scanner({ onDetected, processing, autoStart, onCancel }: Props) {
+export function Scanner({ onDetected, processing, autoStart, active = true, onCancel }: Props) {
   const [mode, setMode] = useState<Mode>(() => autoStart ? 'live' : 'idle')
   const [decoding, setDecoding] = useState(false)
   const [fileError, setFileError] = useState<string | null>(null)
@@ -68,6 +69,19 @@ export function Scanner({ onDetected, processing, autoStart, onCancel }: Props) 
       scannerRef.current?.stop().catch(() => {})
     }
   }, [])
+
+  // Start / stop camera when the panel becomes active or inactive
+  useEffect(() => {
+    if (active) {
+      setMode(prev => prev === 'idle' ? 'live' : prev)
+    } else {
+      if (timerRef.current) clearTimeout(timerRef.current)
+      const scanner = scannerRef.current
+      scannerRef.current = null
+      setMode('idle')
+      scanner?.stop().catch(() => {})
+    }
+  }, [active]) // eslint-disable-line react-hooks/exhaustive-deps
 
   function stopScanning() {
     if (timerRef.current) clearTimeout(timerRef.current)

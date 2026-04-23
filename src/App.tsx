@@ -179,36 +179,35 @@ function App() {
       </header>
 
       <main className="flex flex-1 flex-col gap-5">
-        <div
-          key={showScanner ? 'scanner' : 'chart'}
-          className="animate-fade-in"
-        >
-          {showScanner ? (
-            <>
-              <Scanner
-                onDetected={handleIsbn}
-                processing={status.kind === 'processing'}
-                autoStart
-                onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
-              />
-
-              {status.kind === 'error' && (
-                <div className="mt-4 flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
-                  <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
-                  <button
-                    type="button"
-                    onClick={() => setStatus({ kind: 'idle' })}
-                    aria-label="Fermer"
-                    className="ml-3 shrink-0 text-red-400 hover:text-red-600"
-                  >
-                    ✕
-                  </button>
-                </div>
-              )}
-            </>
-          ) : (
+        <div className="panel-swap-grid">
+          {/* Chart panel — slides up and out when scanner opens */}
+          <div className={showScanner ? 'panel-out-up' : 'panel-in'}>
             <HomeChart />
-          )}
+          </div>
+
+          {/* Scanner panel — slides up from below when scanner opens */}
+          <div className={showScanner ? 'panel-in' : 'panel-out-down'}>
+            <Scanner
+              onDetected={handleIsbn}
+              processing={status.kind === 'processing'}
+              active={showScanner}
+              onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }) }}
+            />
+
+            {status.kind === 'error' && (
+              <div className="mt-4 flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
+                <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
+                <button
+                  type="button"
+                  onClick={() => setStatus({ kind: 'idle' })}
+                  aria-label="Fermer"
+                  className="ml-3 shrink-0 text-red-400 hover:text-red-600"
+                >
+                  ✕
+                </button>
+              </div>
+            )}
+          </div>
         </div>
 
         {!showScanner && (
