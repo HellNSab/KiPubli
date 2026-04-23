@@ -50,7 +50,7 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
       </div>
 
       {/* Card 1 — répartition du prix */}
-      <div className="rounded-2xl border border-[#2A2A28] bg-[#161614] px-4 py-4 dark:bg-[#161614]">
+      <div className="rounded-2xl border border-[#E5E5E3] bg-white px-4 py-4 dark:border-[#2A2A28] dark:bg-[#161614]">
         <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-subtle">
           Pour un livre à 20&nbsp;€
         </p>
@@ -93,7 +93,7 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
       </div>
 
       {/* Card 2 — concentration */}
-      <div className="rounded-2xl border border-[#2A2A28] bg-[#161614] px-4 py-4 dark:bg-[#161614]">
+      <div className="rounded-2xl border border-[#E5E5E3] bg-white px-4 py-4 dark:border-[#2A2A28] dark:bg-[#161614]">
         <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-subtle">
           Qui contrôle quoi&nbsp;?
         </p>
@@ -105,7 +105,7 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
                 <span className="text-sm font-semibold text-ink dark:text-white">{row.label}</span>
                 <span className="text-xs text-muted dark:text-subtle">{row.count}</span>
               </div>
-              <div className="my-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#2A2A28]">
+              <div className="my-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#E5E5E3] dark:bg-[#2A2A28]">
                 <div
                   className="h-full rounded-full"
                   style={{ width: `${row.fill * 100}%`, background: row.color }}
@@ -121,10 +121,10 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
       <div className="rounded-2xl border border-accent/30 bg-accent/10 px-4 py-4">
         <p className="text-sm leading-relaxed text-accent dark:text-accent-light">
           Scannez un livre pour savoir si son éditeur est{' '}
-          <strong className="font-semibold text-white">indépendant</strong>, appartient à{' '}
-          <strong className="font-semibold text-white">LVMH</strong>, à{' '}
-          <strong className="font-semibold text-white">CMA CGM</strong>, ou à une{' '}
-          <strong className="font-semibold text-white">famille</strong>{' '}
+          <strong className="font-semibold dark:text-white">indépendant</strong>, appartient à{' '}
+          <strong className="font-semibold dark:text-white">LVMH</strong>, à{' '}
+          <strong className="font-semibold dark:text-white">CMA CGM</strong>, ou à une{' '}
+          <strong className="font-semibold dark:text-white">famille</strong>{' '}
           — et quel distributeur achemine l'argent.
         </p>
       </div>
