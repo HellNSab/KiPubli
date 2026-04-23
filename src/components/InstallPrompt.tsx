@@ -48,39 +48,43 @@ export function InstallPrompt() {
 
   if (state.kind === 'android') {
     return (
-      <div className="mt-4 flex items-center justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint dark:border-indigo-800 dark:bg-indigo-950/40 px-4 py-3">
-        <p className="text-sm text-[#3730A3] dark:text-accent-light">Installer l'application sur votre téléphone</p>
-        <button
-          type="button"
-          onClick={handleInstall}
-          className="ml-4 shrink-0 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-hover"
-        >
-          Installer
-        </button>
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-5 pt-2">
+        <div className="mx-auto flex max-w-lg items-center justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint px-4 py-3 shadow-lg dark:border-indigo-800 dark:bg-indigo-950/95">
+          <p className="text-sm text-[#3730A3] dark:text-accent-light">Installer l'application sur votre téléphone</p>
+          <button
+            type="button"
+            onClick={handleInstall}
+            className="ml-4 shrink-0 rounded-lg bg-accent px-3 py-1.5 text-sm font-medium text-white hover:bg-accent-hover"
+          >
+            Installer
+          </button>
+        </div>
       </div>
     )
   }
 
   if (state.kind === 'ios' && !iosDismissed) {
     return (
-      <div className="mt-4 flex items-start justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint dark:border-indigo-800 dark:bg-indigo-950/40 px-4 py-3">
-        <p className="text-sm text-[#3730A3] dark:text-accent-light">
-          Pour installer : appuyez sur{' '}
-          <span className="font-medium">Partager</span>{' '}
-          <svg className="inline h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-            <path d="M8 12H3v9h18v-9h-5M12 3v12M8 7l4-4 4 4" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>{' '}
-          puis{' '}
-          <span className="font-medium">« Sur l'écran d'accueil »</span>
-        </p>
-        <button
-          type="button"
-          onClick={() => setIosDismissed(true)}
-          aria-label="Fermer"
-          className="ml-3 shrink-0 text-accent/40 hover:text-accent"
-        >
-          ✕
-        </button>
+      <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-5 pt-2">
+        <div className="mx-auto flex max-w-lg items-start justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint px-4 py-3 shadow-lg dark:border-indigo-800 dark:bg-indigo-950/95">
+          <p className="text-sm text-[#3730A3] dark:text-accent-light">
+            Pour installer : appuyez sur{' '}
+            <span className="font-medium">Partager</span>{' '}
+            <svg className="inline h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <path d="M8 12H3v9h18v-9h-5M12 3v12M8 7l4-4 4 4" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>{' '}
+            puis{' '}
+            <span className="font-medium">« Sur l'écran d'accueil »</span>
+          </p>
+          <button
+            type="button"
+            onClick={() => setIosDismissed(true)}
+            aria-label="Fermer"
+            className="ml-3 shrink-0 text-accent/40 hover:text-accent"
+          >
+            ✕
+          </button>
+        </div>
       </div>
     )
   }

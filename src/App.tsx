@@ -134,204 +134,209 @@ function App() {
     setShowScanner(nextScanner)
   }
 
-  // ── Result view ──────────────────────────────────────────────
-  if (view === 'result' && viewedResult) {
-    return (
-      <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
-        <button
-          type="button"
-          onClick={() => { navigateTo('home', { noHistory: true }); window.history.back() }}
-          className="mb-6 flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-ink dark:text-subtle dark:hover:text-white"
-        >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
-            <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          Scanner un autre livre
-        </button>
+  const showResult = view === 'result' && !!viewedResult
+  const showLearn = view === 'learn'
+  const showHome = !showResult && !showLearn
 
-        <main className="flex flex-1 flex-col gap-4">
-          <ResultCard book={viewedResult.book} chain={viewedResult.chain} />
-        </main>
-
-        <footer className="mt-8 text-center text-[11px] text-subtle">
-          Données mises à jour bénévolement, susceptibles d'être incomplètes · Métadonnées via Google Books
-        </footer>
-      </div>
-    )
-  }
-
-  // ── Learn view ───────────────────────────────────────────────
-  if (view === 'learn') {
-    return (
-      <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6 animate-fade-in">
-        <header className="mb-5 flex items-center gap-3">
-          <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
-            <rect width="80" height="80" rx="20" fill="#4F46E5"/>
-            <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
-            <rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/>
-            <rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/>
-            <rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/>
-            <circle cx="62" cy="60" r="6" fill="white"/>
-            <circle cx="62" cy="60" r="3" fill="#4F46E5"/>
-          </svg>
-          <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-ink dark:text-white">
-            À qui ?
-          </h1>
-        </header>
-
-        <main className="flex flex-1 flex-col">
-          <ChainExplainer
-            onScan={() => navigateTo('home', { showScanner: true, replace: true })}
-            onSkip={() => { navigateTo('home', { noHistory: true }); window.history.back() }}
-          />
-        </main>
-      </div>
-    )
-  }
-
-  // ── Home view ────────────────────────────────────────────────
   return (
-    <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6">
-      <header className="mb-5 flex items-center gap-3">
-        <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
-          <rect width="80" height="80" rx="20" fill="#4F46E5"/>
-          <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
-          <rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/>
-          <rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/>
-          <rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/>
-          <circle cx="62" cy="60" r="6" fill="white"/>
-          <circle cx="62" cy="60" r="3" fill="#4F46E5"/>
-        </svg>
-        <div>
-          <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-ink dark:text-white">
-            À qui ?
-          </h1>
-          <p className="text-xs text-muted dark:text-subtle">
-            {showScanner ? 'Scannez un code-barres ISBN' : 'Où va l\'argent d\'un livre à 20 €'}
-          </p>
+    <>
+      {/* ── Result view ─────────────────────────────────────── */}
+      {showResult && (
+        <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6 pb-28">
+          <button
+            type="button"
+            onClick={() => { navigateTo('home', { noHistory: true }); window.history.back() }}
+            className="mb-6 flex items-center gap-1.5 text-sm font-medium text-muted transition-colors hover:text-ink dark:text-subtle dark:hover:text-white"
+          >
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+              <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            Scanner un autre livre
+          </button>
+
+          <main className="flex flex-1 flex-col gap-4">
+            <ResultCard book={viewedResult!.book} chain={viewedResult!.chain} />
+          </main>
+
+          <footer className="mt-8 text-center text-[11px] text-subtle">
+            Données mises à jour bénévolement, susceptibles d'être incomplètes · Métadonnées via Google Books
+          </footer>
         </div>
-      </header>
+      )}
 
-      <main className="flex flex-1 flex-col gap-5">
-        <div className="panel-swap-grid">
-          {/* Chart panel — slides up and out when scanner opens */}
-          <div className={showScanner ? 'panel-out-up' : 'panel-in'}>
-            <HomeChart />
-          </div>
+      {/* ── Learn view ──────────────────────────────────────── */}
+      {showLearn && (
+        <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6 pb-28 animate-fade-in">
+          <header className="mb-5 flex items-center gap-3">
+            <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
+              <rect width="80" height="80" rx="20" fill="#4F46E5"/>
+              <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
+              <rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/>
+              <rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/>
+              <rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/>
+              <circle cx="62" cy="60" r="6" fill="white"/>
+              <circle cx="62" cy="60" r="3" fill="#4F46E5"/>
+            </svg>
+            <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-ink dark:text-white">
+              À qui ?
+            </h1>
+          </header>
 
-          {/* Scanner panel — slides up from below when scanner opens */}
-          <div className={showScanner ? 'panel-in' : 'panel-out-down'}>
-            <Scanner
-              onDetected={handleIsbn}
-              processing={status.kind === 'processing'}
-              active={showScanner}
-              onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }); window.history.back() }}
+          <main className="flex flex-1 flex-col">
+            <ChainExplainer
+              onScan={() => navigateTo('home', { showScanner: true, replace: true })}
+              onSkip={() => { navigateTo('home', { noHistory: true }); window.history.back() }}
             />
+          </main>
+        </div>
+      )}
 
-            {status.kind === 'error' && (
-              <div className="mt-4 flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
-                <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
+      {/* ── Home view ───────────────────────────────────────── */}
+      {showHome && (
+        <div className="mx-auto flex min-h-full max-w-lg flex-col px-5 py-6 pb-28">
+          <header className="mb-5 flex items-center gap-3">
+            <svg width="36" height="36" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
+              <rect width="80" height="80" rx="20" fill="#4F46E5"/>
+              <text x="29" y="50" textAnchor="middle" fontFamily="Georgia, serif" fontSize="40" fontWeight="700" fill="white">?</text>
+              <rect x="42" y="24" width="22" height="5" rx="2.5" fill="white"/>
+              <rect x="42" y="34" width="15" height="5" rx="2.5" fill="white" opacity="0.6"/>
+              <rect x="42" y="44" width="9" height="5" rx="2.5" fill="white" opacity="0.3"/>
+              <circle cx="62" cy="60" r="6" fill="white"/>
+              <circle cx="62" cy="60" r="3" fill="#4F46E5"/>
+            </svg>
+            <div>
+              <h1 className="text-[22px] font-semibold leading-tight tracking-tight text-ink dark:text-white">
+                À qui ?
+              </h1>
+              <p className="text-xs text-muted dark:text-subtle">
+                {showScanner ? 'Scannez un code-barres ISBN' : 'Où va l\'argent d\'un livre à 20 €'}
+              </p>
+            </div>
+          </header>
+
+          <main className="flex flex-1 flex-col gap-5">
+            <div className="panel-swap-grid">
+              {/* Chart panel — slides up and out when scanner opens */}
+              <div className={showScanner ? 'panel-out-up' : 'panel-in'}>
+                <HomeChart />
+              </div>
+
+              {/* Scanner panel — slides up from below when scanner opens */}
+              <div className={showScanner ? 'panel-in' : 'panel-out-down'}>
+                <Scanner
+                  onDetected={handleIsbn}
+                  processing={status.kind === 'processing'}
+                  active={showScanner}
+                  onCancel={() => { setShowScanner(false); setStatus({ kind: 'idle' }); window.history.back() }}
+                />
+
+                {status.kind === 'error' && (
+                  <div className="mt-4 flex items-start justify-between rounded-xl bg-red-50 px-4 py-3 dark:bg-red-950/30">
+                    <p className="text-sm text-red-800 dark:text-red-300">{status.message}</p>
+                    <button
+                      type="button"
+                      onClick={() => setStatus({ kind: 'idle' })}
+                      aria-label="Fermer"
+                      className="ml-3 shrink-0 text-red-400 hover:text-red-600"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
+
+            {!showScanner && (
+              <div className="flex flex-col items-center gap-3">
                 <button
                   type="button"
-                  onClick={() => setStatus({ kind: 'idle' })}
-                  aria-label="Fermer"
-                  className="ml-3 shrink-0 text-red-400 hover:text-red-600"
+                  onClick={() => { setShowScanner(true); window.history.pushState({ view: 'home', showScanner: true }, '') }}
+                  className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#E5E5E3] bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
                 >
-                  ✕
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <rect x="3" y="3" width="4" height="18" rx="1"/>
+                    <rect x="9" y="3" width="2" height="18" rx="0.5"/>
+                    <rect x="13" y="3" width="3" height="18" rx="0.5"/>
+                    <rect x="18" y="3" width="3" height="18" rx="1"/>
+                  </svg>
+                  Scanner un livre
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => navigateTo('learn')}
+                  className="text-sm font-medium text-accent hover:underline"
+                >
+                  En savoir plus sur la chaîne du livre →
                 </button>
               </div>
             )}
-          </div>
-        </div>
 
-        {!showScanner && (
-          <div className="flex flex-col items-center gap-3">
-            <button
-              type="button"
-              onClick={() => { setShowScanner(true); window.history.pushState({ view: 'home', showScanner: true }, '') }}
-              className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#E5E5E3] bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
-            >
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <rect x="3" y="3" width="4" height="18" rx="1"/>
-                <rect x="9" y="3" width="2" height="18" rx="0.5"/>
-                <rect x="13" y="3" width="3" height="18" rx="0.5"/>
-                <rect x="18" y="3" width="3" height="18" rx="1"/>
-              </svg>
-              Scanner un livre
-            </button>
+            {!showScanner && recentResults.length > 0 && (
+              <section className="flex flex-col gap-3">
+                <div className="flex items-center gap-3">
+                  <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
+                  <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle">
+                    Recherches récentes
+                  </p>
+                  <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
+                </div>
 
-            <button
-              type="button"
-              onClick={() => navigateTo('learn')}
-              className="text-sm font-medium text-accent hover:underline"
-            >
-              En savoir plus sur la chaîne du livre →
-            </button>
-          </div>
-        )}
+                <div className="overflow-hidden rounded-2xl border border-[#E5E5E3] dark:border-[#2A2A28]">
+                  {recentResults.map((result, i) => {
+                    const badge = result.chain
+                      ? result.chain.group.listed
+                        ? { label: 'Coté en bourse', className: 'bg-[#FEE2E2] text-[#991B1B] dark:bg-red-950/40 dark:text-red-300' }
+                        : { label: 'Indépendant', className: 'bg-accent-tint text-[#4338CA] dark:bg-indigo-950/60 dark:text-accent-light' }
+                      : null
 
-        {!showScanner && recentResults.length > 0 && (
-          <section className="flex flex-col gap-3">
-            <div className="flex items-center gap-3">
-              <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
-              <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle">
-                Recherches récentes
-              </p>
-              <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
-            </div>
-
-            <div className="overflow-hidden rounded-2xl border border-[#E5E5E3] dark:border-[#2A2A28]">
-              {recentResults.map((result, i) => {
-                const badge = result.chain
-                  ? result.chain.group.listed
-                    ? { label: 'Coté en bourse', className: 'bg-[#FEE2E2] text-[#991B1B] dark:bg-red-950/40 dark:text-red-300' }
-                    : { label: 'Indépendant', className: 'bg-accent-tint text-[#4338CA] dark:bg-indigo-950/60 dark:text-accent-light' }
-                  : null
-
-                return (
-                  <div key={result.book.isbn}>
-                    {i > 0 && <div className="border-t border-[#E5E5E3] dark:border-[#2A2A28]" />}
-                    <button
-                      type="button"
-                      onClick={() => openResult(result)}
-                      className="flex w-full items-center gap-3 bg-white px-4 py-3.5 text-left transition-colors hover:bg-stone-50 dark:bg-dark-card dark:hover:bg-[#242422]"
-                    >
-                      <div className="min-w-0 flex-1">
-                        <p className="truncate font-semibold text-ink dark:text-white">
-                          {result.book.title}
-                        </p>
-                        <div className="mt-0.5 flex items-center gap-2">
-                          <p className="truncate text-sm text-muted">
-                            {[
-                              result.book.authors[0],
-                              result.chain?.publisher.name ?? result.book.publisherRaw,
-                            ].filter(Boolean).join(' · ')}
-                          </p>
-                          {badge && (
-                            <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${badge.className}`}>
-                              {badge.label}
-                            </span>
-                          )}
-                        </div>
+                    return (
+                      <div key={result.book.isbn}>
+                        {i > 0 && <div className="border-t border-[#E5E5E3] dark:border-[#2A2A28]" />}
+                        <button
+                          type="button"
+                          onClick={() => openResult(result)}
+                          className="flex w-full items-center gap-3 bg-white px-4 py-3.5 text-left transition-colors hover:bg-stone-50 dark:bg-dark-card dark:hover:bg-[#242422]"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate font-semibold text-ink dark:text-white">
+                              {result.book.title}
+                            </p>
+                            <div className="mt-0.5 flex items-center gap-2">
+                              <p className="truncate text-sm text-muted">
+                                {[
+                                  result.book.authors[0],
+                                  result.chain?.publisher.name ?? result.book.publisherRaw,
+                                ].filter(Boolean).join(' · ')}
+                              </p>
+                              {badge && (
+                                <span className={`shrink-0 rounded-md px-1.5 py-0.5 text-[10px] font-semibold ${badge.className}`}>
+                                  {badge.label}
+                                </span>
+                              )}
+                            </div>
+                          </div>
+                          <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0 text-subtle">
+                            <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
+                          </svg>
+                        </button>
                       </div>
-                      <svg width="14" height="14" viewBox="0 0 16 16" fill="none" className="shrink-0 text-subtle">
-                        <path d="M6 4l4 4-4 4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
-                  </div>
-                )
-              })}
-            </div>
-          </section>
-        )}
-      </main>
+                    )
+                  })}
+                </div>
+              </section>
+            )}
+          </main>
 
+          <footer className="mt-8 text-center text-[11px] text-subtle">
+            Données mises à jour bénévolement, susceptibles d'être incomplètes · Métadonnées via Google Books
+          </footer>
+        </div>
+      )}
+
+      {/* Fixed install prompt — rendered once, persists across all views */}
       <InstallPrompt />
-
-      <footer className="mt-8 text-center text-[11px] text-subtle">
-        Données mises à jour bénévolement, susceptibles d'être incomplètes · Métadonnées via Google Books
-      </footer>
-    </div>
+    </>
   )
 }
 
