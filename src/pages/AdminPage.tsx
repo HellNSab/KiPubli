@@ -37,8 +37,8 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
   const dots = [1, 2, 3].map(n => password.length >= n)
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-[#F2F2F0] px-4 dark:bg-[#0F0F0E]">
-      <div className={`w-full max-w-sm rounded-3xl bg-white px-8 py-10 shadow-xl transition-transform dark:bg-[#1C1C1A] ${error ? 'animate-shake' : ''}`}>
+    <div className="flex min-h-screen items-center justify-center bg-[#F2F2F0] px-4 dark:bg-dark-bg">
+      <div className={`w-full max-w-sm rounded-3xl bg-white px-8 py-10 shadow-xl transition-transform dark:bg-dark-card ${error ? 'animate-shake' : ''}`}>
 
         {/* Icon */}
         <div className="mb-6 flex justify-center">
@@ -71,7 +71,7 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
                   ? error
                     ? 'bg-red-500'
                     : 'bg-accent'
-                  : 'bg-[#DDDDD9] dark:bg-[#2A2A28]'
+                  : 'bg-[#DDDDD9] dark:bg-stone-800'
               }`}
             />
           ))}
@@ -79,7 +79,7 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
           {/* Password input */}
-          <div className="flex overflow-hidden rounded-2xl bg-[#1C1C1A] dark:bg-[#111110]">
+          <div className="flex overflow-hidden rounded-2xl bg-dark-card dark:bg-dark-surface">
             <input
               ref={inputRef}
               type={visible ? 'text' : 'password'}
@@ -112,7 +112,7 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
           {/* Submit */}
           <button
             type="submit"
-            className="w-full rounded-2xl border border-[#DDDDD9] py-4 text-base font-medium text-ink transition-colors hover:bg-stone-100 dark:border-[#2A2A28] dark:text-white dark:hover:bg-[#242422]"
+            className="w-full rounded-2xl border border-[#DDDDD9] py-4 text-base font-medium text-ink transition-colors hover:bg-stone-100 dark:border-stone-800 dark:text-white dark:hover:bg-[#242422]"
           >
             {error ? 'Mot de passe incorrect' : 'Accéder'}
           </button>
@@ -350,7 +350,7 @@ function SignalementsTab({
                 isExpanded
                   ? 'border-indigo-500/50 bg-[#1A1A18]'
                   : isOpen
-                  ? 'border-white/10 bg-[#1C1C1A] hover:border-white/20'
+                  ? 'border-white/10 bg-dark-card hover:border-white/20'
                   : 'border-white/5 bg-[#161614] opacity-60'
               }`}
             >
@@ -408,7 +408,7 @@ function SignalementsTab({
                         <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
                           Message de l'utilisateur
                         </p>
-                        <div className="rounded-lg border-l-2 border-indigo-400/60 bg-[#111110] px-4 py-3 text-sm leading-relaxed text-gray-300">
+                        <div className="rounded-lg border-l-2 border-indigo-400/60 bg-dark-surface px-4 py-3 text-sm leading-relaxed text-gray-300">
                           {parsed.comment}
                         </div>
                       </div>
@@ -421,12 +421,12 @@ function SignalementsTab({
                           Données actuelles
                         </p>
                         <div className="overflow-hidden rounded-lg border border-white/10">
-                          <div className="flex items-center gap-3 border-b border-white/5 bg-[#111110] px-4 py-2.5">
+                          <div className="flex items-center gap-3 border-b border-white/5 bg-dark-surface px-4 py-2.5">
                             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
                             <span className="w-28 shrink-0 text-xs text-gray-500">Éditeur</span>
                             <span className="text-sm font-semibold text-white">{parsed.publisherName}</span>
                           </div>
-                          <div className="flex items-center gap-3 border-b border-white/5 bg-[#111110] px-4 py-2.5">
+                          <div className="flex items-center gap-3 border-b border-white/5 bg-dark-surface px-4 py-2.5">
                             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
                             <span className="w-28 shrink-0 text-xs text-gray-500">Groupe</span>
                             <span className={`text-sm ${groupMismatch ? 'text-amber-400' : 'text-gray-300'}`}>
@@ -437,7 +437,7 @@ function SignalementsTab({
                               )}
                             </span>
                           </div>
-                          <div className="flex items-center gap-3 bg-[#111110] px-4 py-2.5">
+                          <div className="flex items-center gap-3 bg-dark-surface px-4 py-2.5">
                             <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
                             <span className="w-28 shrink-0 text-xs text-gray-500">Propriétaire</span>
                             <span className="text-sm text-gray-300">
@@ -523,7 +523,7 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
       <div
         ref={ref}
         onClick={e => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl bg-[#1C1C1A] p-6 shadow-2xl"
+        className="w-full max-w-lg rounded-2xl bg-dark-card p-6 shadow-2xl"
       >
         <div className="mb-5 flex items-center justify-between">
           <h3 className="text-base font-semibold text-white">{title}</h3>
@@ -549,7 +549,7 @@ function Field({ label, hint, children }: { label: string; hint?: string; childr
   )
 }
 
-const inputCls = 'rounded-lg border border-white/10 bg-[#111110] px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+const inputCls = 'rounded-lg border border-white/10 bg-dark-surface px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
 
 const Chevron = () => (
   <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" width="14" height="14" viewBox="0 0 16 16" fill="none">
@@ -639,7 +639,7 @@ function GroupForm({ groups, initialData, onSaveStart, onSaved, onSaveError, onC
             id="group-listed"
             checked={form.listed}
             onChange={e => set('listed', e.target.checked)}
-            className="h-4 w-4 rounded border-white/20 bg-[#111110] accent-indigo-500"
+            className="h-4 w-4 rounded border-white/20 bg-dark-surface accent-indigo-500"
           />
           <label htmlFor="group-listed" className="text-sm text-gray-300">Coté en bourse</label>
         </div>
@@ -769,7 +769,7 @@ function DeployToast({
   return (
     <div className="fixed bottom-6 right-6 z-50 w-80 select-none">
       {phase === 'saving' && (
-        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-white/10">
+        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-white/10">
           <div className="flex items-center gap-3">
             <div className="h-8 w-8 shrink-0 animate-spin rounded-full border-2 border-white/10 border-t-indigo-400" />
             <div>
@@ -784,7 +784,7 @@ function DeployToast({
       )}
 
       {phase === 'deploying' && (
-        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-indigo-500/60">
+        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-indigo-500/60">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-500/20">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -811,7 +811,7 @@ function DeployToast({
       )}
 
       {phase === 'live' && (
-        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-green-500/60">
+        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-green-500/60">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/20">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -828,7 +828,7 @@ function DeployToast({
       )}
 
       {phase === 'error' && (
-        <div className="rounded-xl bg-[#1C1C1A] p-4 shadow-2xl ring-1 ring-red-500/60">
+        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-red-500/60">
           <div className="flex items-start gap-3">
             <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/20">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -942,7 +942,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
     : groupsExpanded ? filteredGroups : filteredGroups.slice(0, GROUPS_DEFAULT)
 
   return (
-    <div className="min-h-screen bg-[#111110] text-white">
+    <div className="min-h-screen bg-dark-surface text-white">
       {/* Mobile gate */}
       <div className="flex min-h-screen items-center justify-center md:hidden">
         <p className="px-8 text-center text-sm text-gray-400">
@@ -1042,7 +1042,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       placeholder="Filtrer par ID…"
                       value={groupSearch}
                       onChange={e => setGroupSearch(e.target.value)}
-                      className="w-60 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-white/10 bg-dark-surface px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
                   <button
@@ -1175,7 +1175,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     <SelectWrap
                       value={publisherGroupFilter}
                       onChange={e => setPublisherGroupFilter(e.target.value)}
-                      className="w-60 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-white/10 bg-dark-surface px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
                     >
                       <option value="">Tous les groupes</option>
                       {groups.map(g => (
@@ -1187,7 +1187,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       placeholder="Filtrer par ID…"
                       value={publisherSearch}
                       onChange={e => setPublisherSearch(e.target.value)}
-                      className="w-60 rounded-lg border border-white/10 bg-[#111110] px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-white/10 bg-dark-surface px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
                     />
                   </div>
                   <button

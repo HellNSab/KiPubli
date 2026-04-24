@@ -50,7 +50,7 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
       </div>
 
       {/* Card 1 — répartition du prix */}
-      <div className="rounded-2xl border border-[#E5E5E3] bg-white px-4 py-4 dark:border-[#2A2A28] dark:bg-[#161614]">
+      <div className="rounded-2xl border border-stone-200 bg-white px-4 py-4 dark:border-stone-800 dark:bg-[#161614]">
         <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-subtle">
           Pour un livre à 20&nbsp;€
         </p>
@@ -93,7 +93,7 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
       </div>
 
       {/* Card 2 — concentration */}
-      <div className="rounded-2xl border border-[#E5E5E3] bg-white px-4 py-4 dark:border-[#2A2A28] dark:bg-[#161614]">
+      <div className="rounded-2xl border border-stone-200 bg-white px-4 py-4 dark:border-stone-800 dark:bg-[#161614]">
         <p className="mb-3 text-[10px] font-semibold uppercase tracking-[0.08em] text-subtle">
           Qui contrôle quoi&nbsp;?
         </p>
@@ -105,7 +105,7 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
                 <span className="text-sm font-semibold text-ink dark:text-white">{row.label}</span>
                 <span className="text-xs text-muted dark:text-subtle">{row.count}</span>
               </div>
-              <div className="my-1.5 h-1.5 w-full overflow-hidden rounded-full bg-[#E5E5E3] dark:bg-[#2A2A28]">
+              <div className="my-1.5 h-1.5 w-full overflow-hidden rounded-full bg-stone-200 dark:bg-stone-800">
                 <div
                   className="h-full rounded-full"
                   style={{ width: `${row.fill * 100}%`, background: row.color }}
@@ -137,13 +137,13 @@ export function ChainExplainer({ onScan, onSkip }: Props) {
           className="flex w-full flex-col items-center justify-center rounded-2xl bg-ink py-4 text-center transition-opacity hover:opacity-90 dark:bg-white"
         >
           <span className="text-base font-semibold text-white dark:text-ink">Scanner un livre</span>
-          <span className="text-xs text-[#9B9B97] dark:text-muted">Scannez l'ISBN ou la couverture</span>
+          <span className="text-xs text-subtle dark:text-muted">Scannez l'ISBN ou la couverture</span>
         </button>
 
         <button
           type="button"
           onClick={onSkip}
-          className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-[#2A2A28] py-4 text-sm font-medium text-muted transition-colors hover:text-ink dark:hover:text-white"
+          className="flex w-full items-center justify-center gap-1.5 rounded-2xl border border-stone-200 py-4 text-sm font-medium text-muted transition-colors hover:text-ink dark:border-stone-800 dark:hover:text-white"
         >
           <svg width="14" height="14" viewBox="0 0 16 16" fill="none">
             <path d="M10 12L6 8l4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>

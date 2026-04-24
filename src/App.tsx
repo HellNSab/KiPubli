@@ -251,7 +251,7 @@ function App() {
                 <button
                   type="button"
                   onClick={() => { setShowScanner(true); window.history.pushState({ view: 'home', showScanner: true }, '') }}
-                  className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-[#E5E5E3] bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
+                  className="flex w-full items-center justify-center gap-2.5 rounded-2xl border border-stone-200 bg-transparent py-4 text-base font-semibold text-ink transition-colors hover:bg-stone-50 dark:border-white dark:text-white dark:hover:bg-white/10"
                 >
                   <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                     <rect x="3" y="3" width="4" height="18" rx="1"/>
@@ -275,14 +275,14 @@ function App() {
             {!showScanner && recentResults.length > 0 && (
               <section className="flex flex-col gap-3">
                 <div className="flex items-center gap-3">
-                  <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
+                  <hr className="flex-1 border-stone-200 dark:border-stone-800" />
                   <p className="text-[11px] font-medium uppercase tracking-[0.06em] text-subtle">
                     Recherches récentes
                   </p>
-                  <hr className="flex-1 border-[#E5E5E3] dark:border-[#2A2A28]" />
+                  <hr className="flex-1 border-stone-200 dark:border-stone-800" />
                 </div>
 
-                <div className="overflow-hidden rounded-2xl border border-[#E5E5E3] dark:border-[#2A2A28]">
+                <div className="overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-800">
                   {recentResults.map((result, i) => {
                     const badge = result.chain
                       ? result.chain.group.listed
@@ -292,7 +292,7 @@ function App() {
 
                     return (
                       <div key={result.book.isbn}>
-                        {i > 0 && <div className="border-t border-[#E5E5E3] dark:border-[#2A2A28]" />}
+                        {i > 0 && <div className="border-t border-stone-200 dark:border-stone-800" />}
                         <button
                           type="button"
                           onClick={() => openResult(result)}

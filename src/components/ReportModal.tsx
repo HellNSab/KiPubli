@@ -142,7 +142,7 @@ export function ReportModal({ book, chain, onClose }: Props) {
         ) : (
           <form onSubmit={handleSubmit} className="mt-5 flex flex-col gap-4">
             {/* Pre-filled book info — read-only */}
-            <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:bg-[#1C1C1A] dark:text-[#C5C5C0]">
+            <div className="rounded-xl bg-stone-50 px-4 py-3 text-sm text-stone-700 dark:bg-dark-card dark:text-subtle">
               <p><span className="font-medium">Titre :</span> {book.title}</p>
               <p className="mt-1"><span className="font-medium">ISBN :</span> {book.isbn}</p>
               {book.publisherRaw && (
@@ -171,7 +171,7 @@ export function ReportModal({ book, chain, onClose }: Props) {
                 placeholder="Ex. : le propriétaire a changé, l'éditeur est mal orthographié…"
                 value={comment}
                 onChange={(e) => setComment(e.target.value)}
-                className="rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent dark:border-[#2A2A28] dark:bg-[#111110] dark:text-white"
+                className="rounded-md border border-stone-300 px-3 py-2 text-sm focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent dark:border-stone-800 dark:bg-dark-surface dark:text-white"
               />
             </div>
 

@@ -45,20 +45,20 @@ function ChainRow({
 
 function ChainCard({ children }: { children: React.ReactNode }) {
   return (
-    <div className="overflow-hidden rounded-2xl border border-[#E5E5E3] bg-white dark:border-[#2A2A28] dark:bg-dark-card">
+    <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white dark:border-stone-800 dark:bg-dark-card">
       {children}
     </div>
   )
 }
 
 function Divider() {
-  return <div className="mx-4 border-t border-[#E5E5E3] dark:border-[#2A2A28]" />
+  return <div className="mx-4 border-t border-stone-200 dark:border-stone-800" />
 }
 
 function NoteBox({ text, url }: { text: string; url?: string }) {
   return (
     <div className="rounded-2xl bg-accent-tint px-4 py-3.5 dark:bg-indigo-950/50">
-      <p className="text-sm font-medium leading-relaxed text-[#3730A3] dark:text-accent-light">
+      <p className="text-sm font-medium leading-relaxed text-accent-hover dark:text-accent-light">
         {text}
       </p>
       {url && (
@@ -77,7 +77,7 @@ function NoteBox({ text, url }: { text: string; url?: string }) {
 
 function RoleBox({ children }: { children: React.ReactNode }) {
   return (
-    <div className="rounded-2xl border border-[#E5E5E3] bg-white px-4 py-3.5 dark:border-[#2A2A28] dark:bg-dark-card">
+    <div className="rounded-2xl border border-stone-200 bg-white px-4 py-3.5 dark:border-stone-800 dark:bg-dark-card">
       <p className="text-sm leading-relaxed text-muted dark:text-subtle">{children}</p>
     </div>
   )
@@ -106,7 +106,7 @@ function ConcentrationBar() {
   return (
     <div>
       <SectionLabel>Concentration du marché</SectionLabel>
-      <div className="overflow-hidden rounded-2xl border border-[#E5E5E3] bg-white px-4 py-4 dark:border-[#2A2A28] dark:bg-dark-card">
+      <div className="overflow-hidden rounded-2xl border border-stone-200 bg-white px-4 py-4 dark:border-stone-800 dark:bg-dark-card">
         <div className="flex h-2.5 overflow-hidden rounded-full">
           {DISTRIB_BARS.map(b => (
             <div key={b.label} style={{ width: `${b.pct}%`, backgroundColor: b.color }} />
@@ -245,7 +245,7 @@ export function ResultCard({ book, chain }: Props) {
   return (
     <div className="flex flex-col gap-4">
       {/* Book header */}
-      <div className="flex items-start gap-4 rounded-2xl border border-[#E5E5E3] bg-white p-4 dark:border-[#2A2A28] dark:bg-dark-card">
+      <div className="flex items-start gap-4 rounded-2xl border border-stone-200 bg-white p-4 dark:border-stone-800 dark:bg-dark-card">
         {book.thumbnail ? (
           <img src={book.thumbnail} alt="" className="h-16 w-12 shrink-0 rounded-lg object-cover" />
         ) : (
@@ -272,7 +272,7 @@ export function ResultCard({ book, chain }: Props) {
       {chain ? (
         <>
           {/* Tabs */}
-          <div className="flex border-b border-[#E5E5E3] dark:border-[#2A2A28]">
+          <div className="flex border-b border-stone-200 dark:border-stone-800">
             {TABS.map(t => (
               <button
                 key={t.id}
@@ -312,7 +312,7 @@ export function ResultCard({ book, chain }: Props) {
       <button
         type="button"
         onClick={() => setReporting(true)}
-        className="flex w-full items-center gap-3 rounded-2xl border border-[#E5E5E3] bg-white px-4 py-3.5 text-left text-sm text-muted transition-colors hover:bg-stone-50 dark:border-[#2A2A28] dark:bg-dark-card dark:text-subtle dark:hover:bg-[#242422]"
+        className="flex w-full items-center gap-3 rounded-2xl border border-stone-200 bg-white px-4 py-3.5 text-left text-sm text-muted transition-colors hover:bg-stone-50 dark:border-stone-800 dark:bg-dark-card dark:text-subtle dark:hover:bg-[#242422]"
       >
         <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="shrink-0">
           <path d="M3 2v12M3 2h8l-2 3.5L11 9H3" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>

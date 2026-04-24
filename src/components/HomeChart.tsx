@@ -98,7 +98,7 @@ export function HomeChart() {
 
             <circle
               cx={0} cy={0} r={INNER_R - 2}
-              className="fill-[#FAFAFA] dark:fill-[#0F0F0E] pointer-events-none"
+              className="fill-paper dark:fill-dark-bg pointer-events-none"
             />
             <text
               x={0} y={-7}
@@ -116,7 +116,7 @@ export function HomeChart() {
               textAnchor="middle"
               fontSize="9.5"
               fontFamily="system-ui,-apple-system,sans-serif"
-              className="pointer-events-none select-none fill-[#6B6B68] dark:fill-[#9B9B97]"
+              className="pointer-events-none select-none fill-muted dark:fill-subtle"
             >
               {activeSlice ? activeSlice.label : 'par livre'}
             </text>

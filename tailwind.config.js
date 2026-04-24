@@ -27,6 +27,7 @@ export default {
         'accent-tint': '#EEF2FF',
         'dark-bg': '#0F0F0E',
         'dark-card': '#1C1C1A',
+        'dark-surface': '#111110',
       },
     },
   },

@@ -196,7 +196,7 @@ export function Scanner({ onDetected, processing, autoStart, active = true, onCa
         <button
           type="button"
           onClick={() => { stopScanning(); onCancel?.() }}
-          className="w-full rounded-xl border border-[#E5E5E3] py-4 text-base font-medium text-muted transition-colors hover:bg-stone-50 dark:border-[#2A2A28] dark:text-subtle dark:hover:bg-dark-card"
+          className="w-full rounded-xl border border-stone-200 py-4 text-base font-medium text-muted transition-colors hover:bg-stone-50 dark:border-stone-800 dark:text-subtle dark:hover:bg-dark-card"
         >
           Annuler
         </button>
@@ -216,7 +216,7 @@ export function Scanner({ onDetected, processing, autoStart, active = true, onCa
             placeholder="ISBN manuel — 978…"
             value={manual}
             onChange={(e) => setManual(e.target.value)}
-            className="flex-1 rounded-xl border border-[#E5E5E3] bg-white px-3 py-2.5 text-sm text-ink placeholder:text-subtle focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent dark:border-[#2A2A28] dark:bg-dark-card dark:text-white dark:placeholder:text-subtle"
+            className="flex-1 rounded-xl border border-stone-200 bg-white px-3 py-2.5 text-sm text-ink placeholder:text-subtle focus:border-accent focus:outline-none focus:ring-1 focus:ring-accent dark:border-stone-800 dark:bg-dark-card dark:text-white dark:placeholder:text-subtle"
           />
           <button
             type="submit"

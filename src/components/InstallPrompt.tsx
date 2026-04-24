@@ -49,8 +49,8 @@ export function InstallPrompt() {
   if (state.kind === 'android') {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-5 pt-2">
-        <div className="mx-auto flex max-w-lg items-center justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint px-4 py-3 shadow-lg dark:border-indigo-800 dark:bg-indigo-950/95">
-          <p className="text-sm text-[#3730A3] dark:text-accent-light">Installer l'application sur votre téléphone</p>
+        <div className="mx-auto flex max-w-lg items-center justify-between rounded-xl border border-indigo-200 bg-accent-tint px-4 py-3 shadow-lg dark:border-indigo-800 dark:bg-indigo-950/95">
+          <p className="text-sm text-accent-hover dark:text-accent-light">Installer l'application sur votre téléphone</p>
           <button
             type="button"
             onClick={handleInstall}
@@ -66,8 +66,8 @@ export function InstallPrompt() {
   if (state.kind === 'ios' && !iosDismissed) {
     return (
       <div className="fixed bottom-0 left-0 right-0 z-50 px-4 pb-5 pt-2">
-        <div className="mx-auto flex max-w-lg items-start justify-between rounded-xl border border-[#C7D2FE] bg-accent-tint px-4 py-3 shadow-lg dark:border-indigo-800 dark:bg-indigo-950/95">
-          <p className="text-sm text-[#3730A3] dark:text-accent-light">
+        <div className="mx-auto flex max-w-lg items-start justify-between rounded-xl border border-indigo-200 bg-accent-tint px-4 py-3 shadow-lg dark:border-indigo-800 dark:bg-indigo-950/95">
+          <p className="text-sm text-accent-hover dark:text-accent-light">
             Pour installer : appuyez sur{' '}
             <span className="font-medium">Partager</span>{' '}
             <svg className="inline h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
