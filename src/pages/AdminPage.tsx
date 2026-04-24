@@ -122,6 +122,378 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
   )
 }
 
+const REPO = 'HellNSab/KiPubli'
+
+// ── Signalements types & helpers ──────────────────────────────
+
+interface GithubIssue {
+  id: number
+  number: number
+  title: string
+  state: 'open' | 'closed'
+  created_at: string
+  body: string | null
+  labels: { name: string }[]
+}
+
+function formatRelativeTime(dateStr: string): string {
+  const diffH = Math.floor((Date.now() - new Date(dateStr).getTime()) / 3_600_000)
+  if (diffH < 1) return 'il y a < 1h'
+  if (diffH < 24) return `il y a ${diffH}h`
+  const diffD = Math.floor(diffH / 24)
+  if (diffD === 1) return 'hier'
+  return `il y a ${diffD}j`
+}
+
+function parseIssueBody(body: string | null) {
+  const empty = { bookTitle: '', authors: '', isbn: '', publisherName: '', groupName: '', owner: '', comment: '' }
+  if (!body) return empty
+
+  function field(label: string): string {
+    const prefix = `**${label}** `
+    const idx = body.indexOf(prefix)
+    if (idx < 0) return ''
+    const start = idx + prefix.length
+    const end = body.indexOf('\n', start)
+    return (end < 0 ? body.slice(start) : body.slice(start, end)).trim()
+  }
+
+  const commentMarker = '## Commentaire\n'
+  const commentIdx = body.indexOf(commentMarker)
+  return {
+    bookTitle: field('Titre :'),
+    authors: field('Auteur(s) :'),
+    isbn: field('ISBN :'),
+    publisherName: field('Éditeur identifié :'),
+    groupName: field('Groupe :'),
+    owner: field('Propriétaire ultime :'),
+    comment: commentIdx >= 0 ? body.slice(commentIdx + commentMarker.length).trim() : '',
+  }
+}
+
+function detectCategory(issue: GithubIssue): 'edition' | 'distribution' | 'diffusion' {
+  const text = `${issue.title} ${issue.body ?? ''}`.toLowerCase()
+  if (text.includes('distribut')) return 'distribution'
+  if (text.includes('diffus')) return 'diffusion'
+  return 'edition'
+}
+
+function githubFetchHeaders(): Record<string, string> {
+  const token = import.meta.env.VITE_GITHUB_TOKEN
+  const h: Record<string, string> = { Accept: 'application/vnd.github+json' }
+  if (token) h.Authorization = `Bearer ${token}`
+  return h
+}
+
+async function fetchOpenReportCount(): Promise<number> {
+  try {
+    const r = await fetch(
+      `https://api.github.com/repos/${REPO}/issues?labels=${encodeURIComponent('données')}&state=open&per_page=100`,
+      { headers: githubFetchHeaders() }
+    )
+    if (!r.ok) return 0
+    const arr = await r.json()
+    return Array.isArray(arr) ? arr.length : 0
+  } catch { return 0 }
+}
+
+async function fetchAllReports(): Promise<GithubIssue[]> {
+  const h = githubFetchHeaders()
+  const label = encodeURIComponent('données')
+  const [r1, r2] = await Promise.all([
+    fetch(`https://api.github.com/repos/${REPO}/issues?labels=${label}&state=open&per_page=100`, { headers: h }),
+    fetch(`https://api.github.com/repos/${REPO}/issues?labels=${label}&state=closed&per_page=100`, { headers: h }),
+  ])
+  const [open, closed] = await Promise.all([r1.json(), r2.json()])
+  return [
+    ...(Array.isArray(open) ? open : []),
+    ...(Array.isArray(closed) ? closed : []),
+  ].sort((a: GithubIssue, b: GithubIssue) =>
+    new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+  )
+}
+
+async function closeGithubIssue(number: number): Promise<void> {
+  const token = import.meta.env.VITE_GITHUB_TOKEN
+  if (!token) throw new Error('TOKEN_MISSING')
+  const res = await fetch(`https://api.github.com/repos/${REPO}/issues/${number}`, {
+    method: 'PATCH',
+    headers: { ...githubFetchHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ state: 'closed' }),
+  })
+  if (!res.ok) throw new Error(`github_${res.status}`)
+}
+
+// ── Signalements tab component ────────────────────────────────
+
+function SignalementsTab({
+  groups,
+  publishers,
+  tokenAvailable,
+  onCountChange,
+}: {
+  groups: Group[]
+  publishers: Publisher[]
+  tokenAvailable: boolean
+  onCountChange: (n: number) => void
+}) {
+  const [reports, setReports] = useState<GithubIssue[]>([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+  const [filter, setFilter] = useState<'tous' | 'pending' | 'resolved'>('tous')
+  const [expandedId, setExpandedId] = useState<number | null>(null)
+  const [acting, setActing] = useState<Set<number>>(new Set())
+
+  function load() {
+    setLoading(true)
+    setError(null)
+    fetchAllReports()
+      .then(r => {
+        setReports(r)
+        onCountChange(r.filter(x => x.state === 'open').length)
+      })
+      .catch(() => setError('Impossible de charger les signalements'))
+      .finally(() => setLoading(false))
+  }
+
+  useEffect(load, [])
+
+  async function act(issueNumber: number) {
+    setActing(prev => new Set([...prev, issueNumber]))
+    try {
+      await closeGithubIssue(issueNumber)
+      setReports(r => {
+        const updated = r.map(i =>
+          i.number === issueNumber ? { ...i, state: 'closed' as const } : i
+        )
+        onCountChange(updated.filter(x => x.state === 'open').length)
+        return updated
+      })
+    } catch { /* silent */ } finally {
+      setActing(prev => { const s = new Set(prev); s.delete(issueNumber); return s })
+    }
+  }
+
+  const pending = reports.filter(r => r.state === 'open')
+  const resolved = reports.filter(r => r.state === 'closed')
+  const displayed = filter === 'tous' ? reports : filter === 'pending' ? pending : resolved
+
+  if (loading) return <p className="py-8 text-sm text-gray-400">Chargement des signalements…</p>
+
+  if (error) return (
+    <div className="flex flex-col items-start gap-3 py-8">
+      <p className="text-sm text-red-400">{error}</p>
+      <button
+        onClick={load}
+        className="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-gray-400 hover:text-white"
+      >
+        Réessayer
+      </button>
+    </div>
+  )
+
+  return (
+    <div className="flex flex-col gap-4">
+      {/* Stats */}
+      <div className="flex items-center gap-5 text-sm">
+        <span><strong className="text-amber-400">{pending.length}</strong>{' '}<span className="text-gray-400">à traiter</span></span>
+        <span><strong className="text-green-400">{resolved.length}</strong>{' '}<span className="text-gray-400">résolus</span></span>
+        <span><strong className="text-white">{reports.length}</strong>{' '}<span className="text-gray-400">total</span></span>
+      </div>
+
+      {/* Filter tabs */}
+      <div className="flex gap-2">
+        {(['tous', 'pending', 'resolved'] as const).map(v => (
+          <button
+            key={v}
+            onClick={() => setFilter(v)}
+            className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+              filter === v
+                ? 'border-white/20 bg-white/10 text-white'
+                : 'border-white/10 text-gray-400 hover:border-white/20 hover:text-white'
+            }`}
+          >
+            {v === 'tous' ? 'Tous' : v === 'pending' ? 'À traiter' : 'Résolus'}
+          </button>
+        ))}
+      </div>
+
+      {/* List */}
+      <div className="flex flex-col gap-3">
+        {displayed.length === 0 && (
+          <p className="py-12 text-center text-sm text-gray-500">
+            {filter === 'pending'
+              ? 'Aucun signalement à traiter.'
+              : filter === 'resolved'
+              ? 'Aucun signalement résolu.'
+              : 'Aucun signalement.'}
+          </p>
+        )}
+
+        {displayed.map(issue => {
+          const parsed = parseIssueBody(issue.body)
+          const category = detectCategory(issue)
+          const isExpanded = expandedId === issue.id
+          const isOpen = issue.state === 'open'
+          const isActing = acting.has(issue.number)
+          const currentPublisher = publishers.find(p => p.name === parsed.publisherName)
+          const currentGroup = currentPublisher
+            ? groups.find(g => g.id === currentPublisher.group_id)
+            : null
+          const groupMismatch =
+            parsed.groupName && currentGroup && currentGroup.name !== parsed.groupName
+
+          return (
+            <div
+              key={issue.id}
+              className={`overflow-hidden rounded-xl border transition-colors ${
+                isExpanded
+                  ? 'border-indigo-500/50 bg-[#1A1A18]'
+                  : isOpen
+                  ? 'border-white/10 bg-[#1C1C1A] hover:border-white/20'
+                  : 'border-white/5 bg-[#161614] opacity-60'
+              }`}
+            >
+              {/* Card header */}
+              <button
+                className="flex w-full items-start gap-3 px-5 py-4 text-left"
+                onClick={() => setExpandedId(isExpanded ? null : issue.id)}
+              >
+                <span
+                  className={`mt-1 h-2 w-2 shrink-0 rounded-full ${isOpen ? 'bg-amber-400' : 'bg-green-500'}`}
+                />
+                <div className="min-w-0 flex-1">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className={`text-sm font-medium ${isOpen ? 'text-white' : 'text-gray-400'}`}>
+                      {issue.title.replace(/^Erreur signalée\s*:\s*/i, '')}
+                    </span>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                      isOpen ? 'bg-amber-400/15 text-amber-400' : 'bg-green-500/15 text-green-400'
+                    }`}>
+                      {isOpen ? 'À traiter' : 'Résolu'}
+                    </span>
+                    <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
+                      category === 'distribution'
+                        ? 'bg-orange-400/15 text-orange-400'
+                        : category === 'diffusion'
+                        ? 'bg-sky-400/15 text-sky-400'
+                        : 'bg-indigo-400/15 text-indigo-400'
+                    }`}>
+                      {category === 'distribution'
+                        ? 'Distribution'
+                        : category === 'diffusion'
+                        ? 'Diffusion'
+                        : 'Chaîne édition'}
+                    </span>
+                  </div>
+                  {(parsed.bookTitle || parsed.isbn) && (
+                    <p className="mt-0.5 truncate text-xs text-gray-500">
+                      {[parsed.bookTitle, parsed.authors, parsed.isbn].filter(Boolean).join(' · ')}
+                    </p>
+                  )}
+                </div>
+                <span className="shrink-0 text-xs text-gray-600">
+                  {formatRelativeTime(issue.created_at)}
+                </span>
+              </button>
+
+              {/* Expanded detail */}
+              {isExpanded && (
+                <div className="border-t border-white/10 px-5 pb-5 pt-4">
+                  <div className="flex flex-col gap-5">
+
+                    {/* User message */}
+                    {parsed.comment && (
+                      <div>
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+                          Message de l'utilisateur
+                        </p>
+                        <div className="rounded-lg border-l-2 border-indigo-400/60 bg-[#111110] px-4 py-3 text-sm leading-relaxed text-gray-300">
+                          {parsed.comment}
+                        </div>
+                      </div>
+                    )}
+
+                    {/* Données actuelles */}
+                    {parsed.publisherName && (
+                      <div>
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+                          Données actuelles
+                        </p>
+                        <div className="overflow-hidden rounded-lg border border-white/10">
+                          <div className="flex items-center gap-3 border-b border-white/5 bg-[#111110] px-4 py-2.5">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
+                            <span className="w-28 shrink-0 text-xs text-gray-500">Éditeur</span>
+                            <span className="text-sm font-semibold text-white">{parsed.publisherName}</span>
+                          </div>
+                          <div className="flex items-center gap-3 border-b border-white/5 bg-[#111110] px-4 py-2.5">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
+                            <span className="w-28 shrink-0 text-xs text-gray-500">Groupe</span>
+                            <span className={`text-sm ${groupMismatch ? 'text-amber-400' : 'text-gray-300'}`}>
+                              {groupMismatch && <span className="mr-1.5 text-amber-400">⚠</span>}
+                              {currentGroup?.name ?? parsed.groupName}
+                              {groupMismatch && (
+                                <span className="ml-2 text-xs text-gray-500">était : {parsed.groupName}</span>
+                              )}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-3 bg-[#111110] px-4 py-2.5">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
+                            <span className="w-28 shrink-0 text-xs text-gray-500">Propriétaire</span>
+                            <span className="text-sm text-gray-300">
+                              {currentGroup?.owner ?? parsed.owner}
+                            </span>
+                          </div>
+                        </div>
+                        {!currentPublisher && (
+                          <p className="mt-2 text-xs text-amber-400/70">
+                            Éditeur introuvable dans la base — peut-être déjà corrigé ou non référencé.
+                          </p>
+                        )}
+                      </div>
+                    )}
+
+                    {/* Actions */}
+                    {isOpen && (
+                      <div className="flex items-center gap-2 pt-1">
+                        {tokenAvailable ? (
+                          <>
+                            <button
+                              disabled={isActing}
+                              onClick={() => act(issue.number)}
+                              className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:opacity-50"
+                            >
+                              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                <polyline points="20 6 9 17 4 12"/>
+                              </svg>
+                              Marquer comme résolu
+                            </button>
+                            <button
+                              disabled={isActing}
+                              onClick={() => act(issue.number)}
+                              className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-gray-400 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
+                            >
+                              Ignorer
+                            </button>
+                          </>
+                        ) : (
+                          <p className="text-xs text-amber-400/70">
+                            VITE_GITHUB_TOKEN requis pour les actions
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )}
+            </div>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
 const GROUP_COLORS: Record<string, string> = {
   lagardere: '#EF4444',
   editis: '#F97316',
@@ -508,6 +880,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
   const [editingGroup, setEditingGroup] = useState<Group | null>(null)
   const [editingPublisher, setEditingPublisher] = useState<Publisher | null>(null)
   const [deployPhase, setDeployPhase] = useState<DeployPhase>('idle')
+  const [openReportCount, setOpenReportCount] = useState(0)
   const deployAbort = useRef<AbortController | null>(null)
   const deploySince = useRef<Date>(new Date())
 
@@ -553,6 +926,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
   }
 
   useEffect(() => { if (authed) loadData() }, [authed])
+  useEffect(() => { if (authed) fetchOpenReportCount().then(setOpenReportCount) }, [authed])
 
   if (!authed) return <AdminLock onUnlock={() => setAuthed(true)} />
 
@@ -603,19 +977,29 @@ export function AdminPage({ onNavigateToApp }: Props) {
             >
               App
             </button>
-            {(['données', 'signalements'] as Tab[]).map(t => (
-              <button
-                key={t}
-                onClick={() => setTab(t)}
-                className={`rounded-md px-3 py-1.5 text-sm capitalize transition-colors ${
-                  tab === t
-                    ? 'bg-white font-medium text-black'
-                    : 'text-gray-400 hover:text-white'
-                }`}
-              >
-                {t.charAt(0).toUpperCase() + t.slice(1)}
-              </button>
-            ))}
+            <button
+              onClick={() => setTab('données')}
+              className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
+                tab === 'données' ? 'bg-white font-medium text-black' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Données
+            </button>
+            <button
+              onClick={() => setTab('signalements')}
+              className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors ${
+                tab === 'signalements' ? 'bg-white font-medium text-black' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              Signalements
+              {openReportCount > 0 && (
+                <span className={`rounded-full px-1.5 py-0.5 text-xs font-semibold leading-none ${
+                  tab === 'signalements' ? 'bg-amber-500 text-white' : 'bg-amber-400 text-black'
+                }`}>
+                  {openReportCount}
+                </span>
+              )}
+            </button>
           </nav>
         </header>
 
@@ -892,9 +1276,12 @@ export function AdminPage({ onNavigateToApp }: Props) {
               </section>
             </div>
           ) : (
-            <div className="py-20 text-center">
-              <p className="text-sm text-gray-400">Signalements — bientôt disponible</p>
-            </div>
+            <SignalementsTab
+              groups={groups}
+              publishers={publishers}
+              tokenAvailable={tokenAvailable}
+              onCountChange={setOpenReportCount}
+            />
           )}
         </main>
       </div>

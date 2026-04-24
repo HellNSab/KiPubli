@@ -51,6 +51,19 @@ Within the app page there are three views:
 
 **Back from result → home:** "← Scanner un autre livre" nav element at the top of the result page triggers a reverse slide transition.
 
+All view transitions go through the `navigateTo(view, options?)` helper in `App.tsx`.
+It handles three things in order: pushState, scroll reset (window + all panel refs), then setView. Never call setView directly — always use navigateTo.
+
+---
+
+## Back button handling (Android PWA)
+
+All view transitions call `window.history.pushState({ view })` when navigating forward.
+A single `popstate` listener in `App.tsx` intercepts Android back button taps and
+maps them to view state changes. Use `viewRef` (not `view`) inside the listener to
+avoid stale closure bugs. On first load, `replaceState({ view: 'home' })` seeds the
+initial history entry.
+
 ---
 
 ## Source file map
