@@ -148,18 +148,19 @@ function formatRelativeTime(dateStr: string): string {
 function parseIssueBody(body: string | null) {
   const empty = { bookTitle: '', authors: '', isbn: '', publisherName: '', groupName: '', owner: '', comment: '' }
   if (!body) return empty
+  const text = body
 
   function field(label: string): string {
     const prefix = `**${label}** `
-    const idx = body.indexOf(prefix)
+    const idx = text.indexOf(prefix)
     if (idx < 0) return ''
     const start = idx + prefix.length
-    const end = body.indexOf('\n', start)
-    return (end < 0 ? body.slice(start) : body.slice(start, end)).trim()
+    const end = text.indexOf('\n', start)
+    return (end < 0 ? text.slice(start) : text.slice(start, end)).trim()
   }
 
   const commentMarker = '## Commentaire\n'
-  const commentIdx = body.indexOf(commentMarker)
+  const commentIdx = text.indexOf(commentMarker)
   return {
     bookTitle: field('Titre :'),
     authors: field('Auteur(s) :'),
@@ -167,7 +168,7 @@ function parseIssueBody(body: string | null) {
     publisherName: field('Éditeur identifié :'),
     groupName: field('Groupe :'),
     owner: field('Propriétaire ultime :'),
-    comment: commentIdx >= 0 ? body.slice(commentIdx + commentMarker.length).trim() : '',
+    comment: commentIdx >= 0 ? text.slice(commentIdx + commentMarker.length).trim() : '',
   }
 }
 
