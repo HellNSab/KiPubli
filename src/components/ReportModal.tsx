@@ -127,7 +127,7 @@ export function ReportModal({ book, chain, onClose }: Props) {
         {status === 'success' ? (
           <div className="mt-6 flex flex-col items-center gap-4 py-4 text-center">
             <p className="text-4xl">✓</p>
-            <p className="font-medium text-ink">Merci pour votre signalement !</p>
+            <p className="font-medium text-ink dark:text-white">Merci pour votre signalement !</p>
             <p className="text-sm text-stone-500">
               Nous prendrons en compte votre retour lors de la prochaine mise à jour des données.
             </p>
