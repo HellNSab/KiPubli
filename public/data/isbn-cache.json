@@ -5,5 +5,15 @@
     "authors": [],
     "publisherRaw": "Gallimard",
     "thumbnail": "https://openlibrary.org/covers/id/15166217-M.jpg"
+  },
+  "9782080700049": {
+    "isbn": "9782080700049",
+    "title": "Le banquet",
+    "authors": [
+      "Plato",
+      "Emile Chambry"
+    ],
+    "publisherRaw": "Flammarion",
+    "thumbnail": "https://openlibrary.org/covers/id/971119-M.jpg"
   }
 }
