@@ -70,7 +70,7 @@ async function fetchWithRetry(url: string, attempts = 3): Promise<Response> {
 async function fetchFromOpenLibraryApi(
   isbn: string,
 ): Promise<BookMetadata | null> {
-  const url = `https://openlibrary.org/isbn/${isbn}`;
+  const url = `https://openlibrary.org/isbn/${isbn}.json`;
   const res = await fetchWithRetry(url);
   if (!res.ok) throw new Error(`Open library a répondu ${res.status}`);
 
