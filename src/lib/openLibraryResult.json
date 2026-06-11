@@ -1,0 +1,47 @@
+{
+  "identifiers": {
+    "goodreads": ["323141"],
+    "librarything": ["2394110"]
+  },
+  "title": "L'Enracinement",
+  "authors": [
+    {
+      "key": "/authors/OL3040833A"
+    }
+  ],
+  "publish_date": "March 2, 1990",
+  "publishers": ["Editions Flammarion"],
+  "weight": "0.6 ounces",
+  "covers": [966833],
+  "physical_format": "Mass Market Paperback",
+  "subjects": ["Language readers"],
+  "isbn_13": ["9782070325634"],
+  "languages": [
+    {
+      "key": "/languages/fre"
+    }
+  ],
+  "isbn_10": ["2070325636"],
+  "type": {
+    "key": "/type/edition"
+  },
+  "physical_dimensions": "6.9 x 4 x 0.7 inches",
+  "source_records": ["amazon:2070325636"],
+  "key": "/books/OL8837561M",
+  "number_of_pages": 380,
+  "works": [
+    {
+      "key": "/works/OL8857603W"
+    }
+  ],
+  "latest_revision": 7,
+  "revision": 7,
+  "created": {
+    "type": "/type/datetime",
+    "value": "2008-04-30T08:14:56.482104"
+  },
+  "last_modified": {
+    "type": "/type/datetime",
+    "value": "2026-04-18T00:15:22.070975"
+  }
+}

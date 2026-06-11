@@ -92,7 +92,7 @@ src/
 
   lib/
     isbn.ts                — normalizeIsbn, isValidIsbn
-    googleBooks.ts         — fetchBookByIsbn (3 retries, exponential backoff)
+    booksApi.ts            — fetchBookByIsbn (3 retries, exponential backoff, 2 APIs: OpenLibrary + Google Books fallback)
     matchPublisher.ts      — fuzzy publisher name matching with scoring
     githubCsv.ts           — saveGroup, deleteGroup, savePublisher, deletePublisher via GitHub API
     deployPoller.ts        — polls GitHub Actions API after a save to track deploy status
@@ -137,7 +137,7 @@ CSV fields containing commas must be wrapped in double quotes. Double quotes wit
 ## Lookup logic
 
 ```
-ISBN → Google Books API → publisherRaw (string)
+ISBN → Books API → publisherRaw (string)
      → matchPublisher(publisherRaw)
          normalise → score against publishers.name + name_variants
          exact match: 1000 + length | substring: 500 or 250 + length
@@ -151,131 +151,7 @@ ISBN → Google Books API → publisherRaw (string)
 
 ## Home screen explainer — `HomeChart.tsx`
 
-The home screen shows an **animated donut pie chart** with circle packing inside each slice, built with D3. It replaces the scanner until the user taps "Scanner un livre", at which point the chart fades out and the scanner fades in — no other elements move.
-
-### Data source
-All chart data lives in `src/data/chartData.ts` as a typed constant (not fetched). It should match the structure below. Edit this file when slice percentages or actor lists change.
-
-```ts
-// src/data/chartData.ts
-export const CHART_DATA = { ...see JSON below... }
-```
-
-### Chart JSON structure
-```json
-{
-  "title": "Où va l'argent d'un livre à 20 €",
-  "slices": [
-    {
-      "id": "librairie",
-      "label": "Librairie",
-      "color": "#10B981",
-      "euros": 6.0,
-      "pct": 0.30,
-      "description": "La librairie est le seul acteur qui vous fait face. Elle achète les livres au distributeur avec une remise de 30 à 33%, paie le loyer, les salaires, et assume le risque des invendus. Sa marge nette tourne autour de 1% — l'un des commerces les moins rentables de France. Les 3 200 librairies indépendantes restent pourtant le premier circuit de vente du livre, devant Amazon et la Fnac.",
-      "actors": [
-        { "id": "librairies-independantes", "label": "Librairies indépendantes", "weight": 6 },
-        { "id": "fnac-cultura",             "label": "Fnac / Cultura",           "weight": 4 },
-        { "id": "gsa",                      "label": "Grande distribution",       "weight": 3 },
-        { "id": "amazon-ligne",             "label": "Amazon & vente en ligne",   "weight": 3 },
-        { "id": "autres-circuits",          "label": "Autres circuits",           "weight": 2 }
-      ]
-    },
-    {
-      "id": "editeur",
-      "label": "Éditeur",
-      "color": "#6366F1",
-      "euros": 5.60,
-      "pct": 0.28,
-      "description": "L'éditeur choisit les livres, finance leur fabrication, fixe le prix et décide des tirages. En apparence nombreux — il existe ~8 000 maisons d'édition en France — le secteur est en réalité très concentré : trois groupes (Lagardère, Editis, Madrigall) réalisent plus de 50% des ventes. Beaucoup de marques que vous connaissez — Pocket, Folio, 10/18 — sont des étiquettes commerciales de ces groupes, pas des éditeurs indépendants.",
-      "actors": [
-        { "id": "lagardere",        "label": "Lagardère / LVMH",       "weight": 9 },
-        { "id": "editis",           "label": "Editis / CMA CGM",        "weight": 8 },
-        { "id": "madrigall",        "label": "Madrigall",               "weight": 7 },
-        { "id": "media-part",       "label": "Média-Participations",    "weight": 4 },
-        { "id": "actes-sud",        "label": "Actes Sud",               "weight": 3 },
-        { "id": "albin-michel",     "label": "Albin Michel",            "weight": 3 },
-        { "id": "humensis",         "label": "Humensis",                "weight": 2 },
-        { "id": "petit-1",          "label": "Petits éditeurs indép.",  "weight": 1 },
-        { "id": "petit-2",          "label": "Petits éditeurs indép.",  "weight": 1 },
-        { "id": "petit-3",          "label": "Petits éditeurs indép.",  "weight": 1 },
-        { "id": "petit-4",          "label": "Petits éditeurs indép.",  "weight": 1 },
-        { "id": "petit-5",          "label": "Petits éditeurs indép.",  "weight": 1 }
-      ]
-    },
-    {
-      "id": "diffusion-distribution",
-      "label": "Diffusion & distribution",
-      "color": "#F59E0B",
-      "euros": 2.60,
-      "pct": 0.13,
-      "description": "Le diffuseur et le distributeur sont les deux maillons logistiques et commerciaux entre l'éditeur et la librairie. Le diffuseur envoie ses représentants en librairie pour présenter les nouveautés et prendre les commandes. Le distributeur achemine physiquement les livres, gère les stocks et traite les retours. Sans eux, un livre n'existe pas en rayon. Le marché est extrêmement concentré : trois acteurs contrôlent l'essentiel du flux national.",
-      "actors": [
-        { "id": "hachette-distrib", "label": "Hachette Distribution",  "weight": 10 },
-        { "id": "interforum",       "label": "Interforum (Editis)",     "weight": 9 },
-        { "id": "sodis",            "label": "Sodis / Union Distrib.",  "weight": 7 },
-        { "id": "autres-distrib",   "label": "Autres",                  "weight": 2 }
-      ]
-    },
-    {
-      "id": "auteur",
-      "label": "Auteur·e",
-      "color": "#EC4899",
-      "euros": 2.00,
-      "pct": 0.10,
-      "description": "L'auteur crée l'œuvre et touche en moyenne 8 à 10% du prix hors taxe — soit environ 1,60 € sur un livre à 20 €. Il est payé en dernier, après tous les autres intermédiaires, et n'a aucun contrôle sur la mise en rayon ni sur le choix du distributeur. Ils sont 101 600 auteurs de livres en France, pour la grande majorité avec des revenus très modestes tirés de l'écriture.",
-      "actors": [
-        { "id": "a1",  "weight": 1 }, { "id": "a2",  "weight": 1 }, { "id": "a3",  "weight": 1 },
-        { "id": "a4",  "weight": 1 }, { "id": "a5",  "weight": 1 }, { "id": "a6",  "weight": 1 },
-        { "id": "a7",  "weight": 1 }, { "id": "a8",  "weight": 1 }, { "id": "a9",  "weight": 1 },
-        { "id": "a10", "weight": 1 }, { "id": "a11", "weight": 1 }, { "id": "a12", "weight": 1 },
-        { "id": "a13", "weight": 1 }, { "id": "a14", "weight": 1 }, { "id": "a15", "weight": 1 },
-        { "id": "a16", "weight": 1 }, { "id": "a17", "weight": 1 }, { "id": "a18", "weight": 1 },
-        { "id": "a19", "weight": 1 }, { "id": "a20", "weight": 1 }
-      ]
-    },
-    {
-      "id": "tva",
-      "label": "TVA",
-      "color": "#64748B",
-      "euros": 1.10,
-      "pct": 0.06,
-      "description": "Le livre bénéficie d'un taux de TVA réduit à 5,5%, contre 20% pour la plupart des biens. C'est une exception culturelle française qui date de 1971, reconnaissant le livre comme bien essentiel. Ce taux s'applique aussi bien aux livres physiques qu'aux livres numériques depuis 2012.",
-      "actors": [
-        { "id": "etat", "label": "État français", "weight": 10 }
-      ]
-    },
-    {
-      "id": "groupe",
-      "label": "Groupe holding",
-      "color": "#818CF8",
-      "euros": 1.60,
-      "pct": 0.08,
-      "description": "Les groupes éditoriaux détiennent plusieurs maisons d'édition sous une même holding. C'est à ce niveau que se prennent les décisions stratégiques et financières. Le secteur est fortement concentré : une poignée de groupes contrôle la majorité des ventes, des capacités de distribution, et donc de la visibilité en librairie.",
-      "actors": [
-        { "id": "lvmh",              "label": "LVMH / Arnault",       "weight": 8 },
-        { "id": "cmacgm",            "label": "CMA CGM / Saadé",      "weight": 7 },
-        { "id": "fam-gallimard",     "label": "Fam. Gallimard",       "weight": 6 },
-        { "id": "fam-lombard",       "label": "Fam. Lombard",         "weight": 5 },
-        { "id": "fam-nyssen",        "label": "Fam. Nyssen",          "weight": 4 },
-        { "id": "fam-esmenard",      "label": "Fam. Esménard",        "weight": 4 },
-        { "id": "andera",            "label": "Andera / CDC",         "weight": 3 }
-      ]
-    }
-  ]
-}
-```
-
-### D3 circle packing implementation notes
-- Use `d3.packSiblings()` on each slice's actors array, with `r = Math.sqrt(actor.weight) * SCALE`
-- SCALE should be computed per slice from the slice's arc area: `SCALE = Math.sqrt(arcArea * 0.72 / rawAreaSum)`
-- Position the packed group at the slice's visual centroid: `midAngle = (startAngle + endAngle) / 2`, `centroidR = (innerR + outerR) / 2`
-- Apply a `<clipPath>` per slice using the same `d3.arc()` path — this handles overflow cleanly
-- For narrow slices (pct < 0.08), apply an additional `narrowSliceScale = 0.7` to prevent overflow
-- Entrance animation: CSS `@keyframes circle-fade-in` with staggered `animation-delay` per circle
-  - `animationDelay: sliceIndex * 80 + circleIndex * 25` ms
-  - `animation-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1)` — slight spring overshoot
-- On slice tap: selected slice translates outward along its mid-angle by 8px; non-selected slices go to opacity 0.3; `description` text appears below the chart
+The home screen shows an **animated donut pie chart** with circle packing inside each slice, built by hand. It replaces the scanner until the user taps "Scanner un livre", at which point the chart fades out and the scanner fades in — no other elements move.
 
 ---
 
@@ -385,43 +261,16 @@ The `repository.ts` abstraction means the rest of the app doesn't need to change
 ```
 React 19 + Vite — GitHub Pages (/KiPubli/)
   ↓
-src/data/chartData.ts   — pie chart + circle packing data (static, typed)
 public/data/*.csv       — publisher + group database (static, fetched at runtime)
   ↓
-Google Books API        — ISBN → book metadata (no key, 3 retries + backoff)
-localStorage            — ISBN lookup cache (keyed by ISBN, 7-day TTL)
+Books API               — ISBN → book metadata (no key, 3 retries + backoff on 2 potential APIs)
+Cache                   — ISBN lookup cache (keyed by ISBN, 7-day TTL)
   ↓
 html5-qrcode            — live barcode decoding from camera stream
-D3 (d3-hierarchy)       — circle packing for HomeChart.tsx
   ↓
 GitHub Contents API     — admin writes (CSV commits, requires VITE_GITHUB_TOKEN)
 GitHub Actions API      — deploy status polling after admin saves
 ```
-
----
-
-## Next steps for Claude Code
-
-In priority order:
-
-### 1. Add distributeur/diffuseur columns to groups.csv
-The CSV now has four new columns: `distributeur`, `distributeur_owner`, `diffuseur`, `diffuseur_owner`. Update `types.ts` (Group type) and `csvLoader.ts` to parse them. Update `repository.ts` to include them in `getOwnershipChain()`. Update the admin groups table to show and edit these fields.
-
-### 2. Build ResultTabs.tsx
-Replace the current single-view `ResultCard.tsx` with a three-tab layout (Édition / Diffusion / Distribution). Each tab has a brief role explainer, the entity name + owner, and a "Signaler une erreur" button. Flag visually (yellow badge) when `distributeur_owner` differs from the publisher group's `owner` — this is the key transparency insight.
-
-### 3. Build HomeChart.tsx
-Animated donut chart with D3 circle packing. See "Home screen explainer" section above for full spec. Use `src/data/chartData.ts` as the data source. The chart replaces the scanner on the home screen; tapping "Scanner un livre" swaps them with a fade transition. D3 dependency: `npm install d3-shape d3-hierarchy`.
-
-### 4. Implement home ↔ scanner ↔ result transitions
-- Home → scanner: chart fades out, scanner fades in. Bottom bar button label changes from "Scanner un livre" to "Fermer le scanner". No other elements move.
-- Scanner → result: full page slide up transition (scanner slides up and out, result slides up and in).
-- Result → home: "← Scanner un autre livre" at top triggers reverse slide.
-
-### 5. Add isbn-cache.json pre-population script (optional, later)
-A Node script that queries the BnF open data API (https://data.bnf.fr/sparql) for the top French ISBNs and outputs `public/data/isbn-cache.json`. This file is then bundled with the app and checked before any Google Books API call.
-
----
 
 ## Notes for Claude Code
 
@@ -433,4 +282,3 @@ A Node script that queries the BnF open data API (https://data.bnf.fr/sparql) fo
 - CSV fetch paths must use `import.meta.env.BASE_URL` (not `/`) so they resolve on both GitHub Pages (`/KiPubli/`) and locally (`/`)
 - Dark mode is driven by the OS preference (`darkMode: 'media'` in Tailwind config)
 - `VITE_GITHUB_TOKEN` is required for all admin write operations; `VITE_ADMIN_PASSWORD` gates the admin UI itself
-- D3 should only be imported in `HomeChart.tsx` — keep it out of the critical path

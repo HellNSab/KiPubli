@@ -33,14 +33,12 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
     }
   }
 
-  // 3 dots fill as you type
   const dots = [1, 2, 3].map(n => password.length >= n)
 
   return (
     <div className="flex min-h-screen items-center justify-center bg-[#F2F2F0] px-4 dark:bg-dark-bg">
       <div className={`w-full max-w-sm rounded-3xl bg-white px-8 py-10 shadow-xl transition-transform dark:bg-dark-card ${error ? 'animate-shake' : ''}`}>
 
-        {/* Icon */}
         <div className="mb-6 flex justify-center">
           <svg width="72" height="72" viewBox="0 0 80 80" className="rounded-2xl">
             <rect width="80" height="80" rx="20" fill="#4F46E5"/>
@@ -53,7 +51,6 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
           </svg>
         </div>
 
-        {/* Title */}
         <h1 className="text-center text-2xl font-bold tracking-tight text-ink dark:text-white">
           Accès administrateur
         </h1>
@@ -61,7 +58,6 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
           Entrez votre mot de passe pour accéder à la base de données éditoriale.
         </p>
 
-        {/* Dots */}
         <div className="my-6 flex justify-center gap-2.5">
           {dots.map((filled, i) => (
             <span
@@ -71,27 +67,26 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
                   ? error
                     ? 'bg-red-500'
                     : 'bg-accent'
-                  : 'bg-[#DDDDD9] dark:bg-stone-800'
+                  : 'bg-ink/15 dark:bg-stone-800'
               }`}
             />
           ))}
         </div>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          {/* Password input */}
-          <div className="flex overflow-hidden rounded-2xl bg-dark-card dark:bg-dark-surface">
+          <div className="flex overflow-hidden rounded-2xl bg-ink/5 dark:bg-dark-card ring-1 ring-ink/10 dark:ring-white/10">
             <input
               ref={inputRef}
               type={visible ? 'text' : 'password'}
               value={password}
               onChange={e => setPassword(e.target.value)}
               placeholder="••••••••"
-              className="flex-1 bg-transparent px-5 py-4 text-base text-white placeholder:text-gray-600 focus:outline-none"
+              className="flex-1 bg-transparent px-5 py-4 text-base text-ink placeholder:text-muted/40 focus:outline-none dark:text-white dark:placeholder:text-gray-600"
             />
             <button
               type="button"
               onClick={() => setVisible(v => !v)}
-              className="px-4 text-gray-500 transition-colors hover:text-white"
+              className="px-4 text-muted transition-colors hover:text-ink dark:text-gray-500 dark:hover:text-white"
               aria-label={visible ? 'Masquer' : 'Afficher'}
             >
               {visible ? (
@@ -109,10 +104,9 @@ function AdminLock({ onUnlock }: { onUnlock: () => void }) {
             </button>
           </div>
 
-          {/* Submit */}
           <button
             type="submit"
-            className="w-full rounded-2xl border border-[#DDDDD9] py-4 text-base font-medium text-ink transition-colors hover:bg-stone-100 dark:border-stone-800 dark:text-white dark:hover:bg-[#242422]"
+            className="w-full rounded-2xl border border-ink/15 py-4 text-base font-medium text-ink transition-colors hover:bg-ink/5 dark:border-stone-800 dark:text-white dark:hover:bg-[#242422]"
           >
             {error ? 'Mot de passe incorrect' : 'Accéder'}
           </button>
@@ -279,14 +273,14 @@ function SignalementsTab({
   const resolved = reports.filter(r => r.state === 'closed')
   const displayed = filter === 'tous' ? reports : filter === 'pending' ? pending : resolved
 
-  if (loading) return <p className="py-8 text-sm text-gray-400">Chargement des signalements…</p>
+  if (loading) return <p className="py-8 text-sm text-muted dark:text-gray-400">Chargement des signalements…</p>
 
   if (error) return (
     <div className="flex flex-col items-start gap-3 py-8">
-      <p className="text-sm text-red-400">{error}</p>
+      <p className="text-sm text-red-500 dark:text-red-400">{error}</p>
       <button
         onClick={load}
-        className="rounded-lg border border-white/10 px-3 py-1.5 text-sm text-gray-400 hover:text-white"
+        className="rounded-lg border border-ink/10 px-3 py-1.5 text-sm text-muted transition-colors hover:text-ink dark:border-white/10 dark:text-gray-400 dark:hover:text-white"
       >
         Réessayer
       </button>
@@ -297,9 +291,9 @@ function SignalementsTab({
     <div className="flex flex-col gap-4">
       {/* Stats */}
       <div className="flex items-center gap-5 text-sm">
-        <span><strong className="text-amber-400">{pending.length}</strong>{' '}<span className="text-gray-400">à traiter</span></span>
-        <span><strong className="text-green-400">{resolved.length}</strong>{' '}<span className="text-gray-400">résolus</span></span>
-        <span><strong className="text-white">{reports.length}</strong>{' '}<span className="text-gray-400">total</span></span>
+        <span><strong className="text-amber-500 dark:text-amber-400">{pending.length}</strong>{' '}<span className="text-muted dark:text-gray-400">à traiter</span></span>
+        <span><strong className="text-green-600 dark:text-green-400">{resolved.length}</strong>{' '}<span className="text-muted dark:text-gray-400">résolus</span></span>
+        <span><strong className="text-ink dark:text-white">{reports.length}</strong>{' '}<span className="text-muted dark:text-gray-400">total</span></span>
       </div>
 
       {/* Filter tabs */}
@@ -310,8 +304,8 @@ function SignalementsTab({
             onClick={() => setFilter(v)}
             className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
               filter === v
-                ? 'border-white/20 bg-white/10 text-white'
-                : 'border-white/10 text-gray-400 hover:border-white/20 hover:text-white'
+                ? 'border-ink/20 bg-ink/10 text-ink dark:border-white/20 dark:bg-white/10 dark:text-white'
+                : 'border-ink/10 text-muted hover:border-ink/20 hover:text-ink dark:border-white/10 dark:text-gray-400 dark:hover:border-white/20 dark:hover:text-white'
             }`}
           >
             {v === 'tous' ? 'Tous' : v === 'pending' ? 'À traiter' : 'Résolus'}
@@ -322,7 +316,7 @@ function SignalementsTab({
       {/* List */}
       <div className="flex flex-col gap-3">
         {displayed.length === 0 && (
-          <p className="py-12 text-center text-sm text-gray-500">
+          <p className="py-12 text-center text-sm text-muted dark:text-gray-500">
             {filter === 'pending'
               ? 'Aucun signalement à traiter.'
               : filter === 'resolved'
@@ -349,10 +343,10 @@ function SignalementsTab({
               key={issue.id}
               className={`overflow-hidden rounded-xl border transition-colors ${
                 isExpanded
-                  ? 'border-indigo-500/50 bg-[#1A1A18]'
+                  ? 'border-indigo-500/50 bg-[#EBEBEA] dark:bg-[#1A1A18]'
                   : isOpen
-                  ? 'border-white/10 bg-dark-card hover:border-white/20'
-                  : 'border-white/5 bg-[#161614] opacity-60'
+                  ? 'border-ink/10 bg-white hover:border-ink/20 dark:border-white/10 dark:bg-dark-card dark:hover:border-white/20'
+                  : 'border-ink/5 bg-[#F5F5F3] opacity-60 dark:border-white/5 dark:bg-[#161614]'
               }`}
             >
               {/* Card header */}
@@ -365,20 +359,20 @@ function SignalementsTab({
                 />
                 <div className="min-w-0 flex-1">
                   <div className="flex flex-wrap items-center gap-2">
-                    <span className={`text-sm font-medium ${isOpen ? 'text-white' : 'text-gray-400'}`}>
+                    <span className={`text-sm font-medium ${isOpen ? 'text-ink dark:text-white' : 'text-muted dark:text-gray-400'}`}>
                       {issue.title.replace(/^Erreur signalée\s*:\s*/i, '')}
                     </span>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
-                      isOpen ? 'bg-amber-400/15 text-amber-400' : 'bg-green-500/15 text-green-400'
+                      isOpen ? 'bg-amber-400/15 text-amber-600 dark:text-amber-400' : 'bg-green-500/15 text-green-600 dark:text-green-400'
                     }`}>
                       {isOpen ? 'À traiter' : 'Résolu'}
                     </span>
                     <span className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
                       category === 'distribution'
-                        ? 'bg-orange-400/15 text-orange-400'
+                        ? 'bg-orange-400/15 text-orange-600 dark:text-orange-400'
                         : category === 'diffusion'
-                        ? 'bg-sky-400/15 text-sky-400'
-                        : 'bg-indigo-400/15 text-indigo-400'
+                        ? 'bg-sky-400/15 text-sky-600 dark:text-sky-400'
+                        : 'bg-indigo-400/15 text-indigo-600 dark:text-indigo-400'
                     }`}>
                       {category === 'distribution'
                         ? 'Distribution'
@@ -388,73 +382,70 @@ function SignalementsTab({
                     </span>
                   </div>
                   {(parsed.bookTitle || parsed.isbn) && (
-                    <p className="mt-0.5 truncate text-xs text-gray-500">
+                    <p className="mt-0.5 truncate text-xs text-muted dark:text-gray-500">
                       {[parsed.bookTitle, parsed.authors, parsed.isbn].filter(Boolean).join(' · ')}
                     </p>
                   )}
                 </div>
-                <span className="shrink-0 text-xs text-gray-600">
+                <span className="shrink-0 text-xs text-ink/40 dark:text-gray-600">
                   {formatRelativeTime(issue.created_at)}
                 </span>
               </button>
 
               {/* Expanded detail */}
               {isExpanded && (
-                <div className="border-t border-white/10 px-5 pb-5 pt-4">
+                <div className="border-t border-ink/10 px-5 pb-5 pt-4 dark:border-white/10">
                   <div className="flex flex-col gap-5">
 
-                    {/* User message */}
                     {parsed.comment && (
                       <div>
-                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted dark:text-gray-500">
                           Message de l'utilisateur
                         </p>
-                        <div className="rounded-lg border-l-2 border-indigo-400/60 bg-dark-surface px-4 py-3 text-sm leading-relaxed text-gray-300">
+                        <div className="rounded-lg border-l-2 border-indigo-400/60 bg-ink/5 px-4 py-3 text-sm leading-relaxed text-ink/70 dark:bg-dark-surface dark:text-gray-300">
                           {parsed.comment}
                         </div>
                       </div>
                     )}
 
-                    {/* Données actuelles */}
                     {parsed.publisherName && (
                       <div>
-                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-gray-500">
+                        <p className="mb-2 text-[10px] font-semibold uppercase tracking-widest text-muted dark:text-gray-500">
                           Données actuelles
                         </p>
-                        <div className="overflow-hidden rounded-lg border border-white/10">
-                          <div className="flex items-center gap-3 border-b border-white/5 bg-dark-surface px-4 py-2.5">
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
-                            <span className="w-28 shrink-0 text-xs text-gray-500">Éditeur</span>
-                            <span className="text-sm font-semibold text-white">{parsed.publisherName}</span>
+                        <div className="overflow-hidden rounded-lg border border-ink/10 dark:border-white/10">
+                          <div className="flex items-center gap-3 border-b border-ink/5 bg-ink/3 px-4 py-2.5 dark:border-white/5 dark:bg-dark-surface">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500 dark:bg-indigo-400" />
+                            <span className="w-28 shrink-0 text-xs text-muted dark:text-gray-500">Éditeur</span>
+                            <span className="text-sm font-semibold text-ink dark:text-white">{parsed.publisherName}</span>
                           </div>
-                          <div className="flex items-center gap-3 border-b border-white/5 bg-dark-surface px-4 py-2.5">
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
-                            <span className="w-28 shrink-0 text-xs text-gray-500">Groupe</span>
-                            <span className={`text-sm ${groupMismatch ? 'text-amber-400' : 'text-gray-300'}`}>
-                              {groupMismatch && <span className="mr-1.5 text-amber-400">⚠</span>}
+                          <div className="flex items-center gap-3 border-b border-ink/5 bg-ink/3 px-4 py-2.5 dark:border-white/5 dark:bg-dark-surface">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500 dark:bg-indigo-400" />
+                            <span className="w-28 shrink-0 text-xs text-muted dark:text-gray-500">Groupe</span>
+                            <span className={`text-sm ${groupMismatch ? 'text-amber-600 dark:text-amber-400' : 'text-ink/70 dark:text-gray-300'}`}>
+                              {groupMismatch && <span className="mr-1.5 text-amber-500 dark:text-amber-400">⚠</span>}
                               {currentGroup?.name ?? parsed.groupName}
                               {groupMismatch && (
-                                <span className="ml-2 text-xs text-gray-500">était : {parsed.groupName}</span>
+                                <span className="ml-2 text-xs text-muted dark:text-gray-500">était : {parsed.groupName}</span>
                               )}
                             </span>
                           </div>
-                          <div className="flex items-center gap-3 bg-dark-surface px-4 py-2.5">
-                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
-                            <span className="w-28 shrink-0 text-xs text-gray-500">Propriétaire</span>
-                            <span className="text-sm text-gray-300">
+                          <div className="flex items-center gap-3 bg-ink/3 px-4 py-2.5 dark:bg-dark-surface">
+                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-500 dark:bg-indigo-400" />
+                            <span className="w-28 shrink-0 text-xs text-muted dark:text-gray-500">Propriétaire</span>
+                            <span className="text-sm text-ink/70 dark:text-gray-300">
                               {currentGroup?.owner ?? parsed.owner}
                             </span>
                           </div>
                         </div>
                         {!currentPublisher && (
-                          <p className="mt-2 text-xs text-amber-400/70">
+                          <p className="mt-2 text-xs text-amber-600/80 dark:text-amber-400/70">
                             Éditeur introuvable dans la base — peut-être déjà corrigé ou non référencé.
                           </p>
                         )}
                       </div>
                     )}
 
-                    {/* Actions */}
                     {isOpen && (
                       <div className="flex items-center gap-2 pt-1">
                         {tokenAvailable ? (
@@ -462,7 +453,7 @@ function SignalementsTab({
                             <button
                               disabled={isActing}
                               onClick={() => act(issue.number)}
-                              className="flex items-center gap-2 rounded-lg border border-white/20 bg-white/5 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-white/10 disabled:opacity-50"
+                              className="flex items-center gap-2 rounded-lg border border-ink/20 bg-ink/5 px-4 py-2.5 text-sm font-medium text-ink transition-colors hover:bg-ink/10 disabled:opacity-50 dark:border-white/20 dark:bg-white/5 dark:text-white dark:hover:bg-white/10"
                             >
                               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                                 <polyline points="20 6 9 17 4 12"/>
@@ -472,13 +463,13 @@ function SignalementsTab({
                             <button
                               disabled={isActing}
                               onClick={() => act(issue.number)}
-                              className="rounded-lg border border-white/10 px-4 py-2.5 text-sm text-gray-400 transition-colors hover:border-white/20 hover:text-white disabled:opacity-50"
+                              className="rounded-lg border border-ink/10 px-4 py-2.5 text-sm text-muted transition-colors hover:border-ink/20 hover:text-ink disabled:opacity-50 dark:border-white/10 dark:text-gray-400 dark:hover:border-white/20 dark:hover:text-white"
                             >
                               Ignorer
                             </button>
                           </>
                         ) : (
-                          <p className="text-xs text-amber-400/70">
+                          <p className="text-xs text-amber-600/80 dark:text-amber-400/70">
                             VITE_GITHUB_TOKEN requis pour les actions
                           </p>
                         )}
@@ -520,15 +511,15 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
   }, [onClose])
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60" onClick={onClose}>
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 dark:bg-black/60" onClick={onClose}>
       <div
         ref={ref}
         onClick={e => e.stopPropagation()}
-        className="w-full max-w-lg rounded-2xl bg-dark-card p-6 shadow-2xl"
+        className="w-full max-w-lg rounded-2xl bg-white p-6 shadow-2xl dark:bg-dark-card"
       >
         <div className="mb-5 flex items-center justify-between">
-          <h3 className="text-base font-semibold text-white">{title}</h3>
-          <button type="button" onClick={onClose} className="text-gray-500 hover:text-white">✕</button>
+          <h3 className="text-base font-semibold text-ink dark:text-white">{title}</h3>
+          <button type="button" onClick={onClose} className="text-muted transition-colors hover:text-ink dark:text-gray-500 dark:hover:text-white">✕</button>
         </div>
         {children}
       </div>
@@ -541,19 +532,19 @@ function Modal({ title, onClose, children }: { title: string; onClose: () => voi
 function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
   return (
     <div className="flex flex-col gap-1.5">
-      <label className="text-xs font-medium text-gray-400">
+      <label className="text-xs font-medium text-muted dark:text-gray-400">
         {label}
-        {hint && <span className="ml-1.5 font-normal text-gray-600">{hint}</span>}
+        {hint && <span className="ml-1.5 font-normal text-subtle dark:text-gray-600">{hint}</span>}
       </label>
       {children}
     </div>
   )
 }
 
-const inputCls = 'rounded-lg border border-white/10 bg-dark-surface px-3 py-2 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500'
+const inputCls = 'rounded-lg border border-ink/10 bg-paper px-3 py-2 text-sm text-ink placeholder:text-muted/40 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500 dark:border-white/10 dark:bg-dark-surface dark:text-white dark:placeholder:text-gray-600'
 
 const Chevron = () => (
-  <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-gray-500" width="14" height="14" viewBox="0 0 16 16" fill="none">
+  <svg className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted dark:text-gray-500" width="14" height="14" viewBox="0 0 16 16" fill="none">
     <path d="M4 6l4 4 4-4" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round"/>
   </svg>
 )
@@ -640,15 +631,15 @@ function GroupForm({ groups, initialData, onSaveStart, onSaved, onSaveError, onC
             id="group-listed"
             checked={form.listed}
             onChange={e => set('listed', e.target.checked)}
-            className="h-4 w-4 rounded border-white/20 bg-dark-surface accent-indigo-500"
+            className="h-4 w-4 rounded border-ink/20 bg-paper accent-indigo-500 dark:border-white/20 dark:bg-dark-surface"
           />
-          <label htmlFor="group-listed" className="text-sm text-gray-300">Coté en bourse</label>
+          <label htmlFor="group-listed" className="text-sm text-ink/70 dark:text-gray-300">Coté en bourse</label>
         </div>
 
-        {error && <p className="rounded-lg bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
+        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">{error}</p>}
 
         <div className="flex items-center justify-end gap-3 pt-1">
-          <button type="button" onClick={onClose} className="text-sm text-gray-500 hover:text-white">Annuler</button>
+          <button type="button" onClick={onClose} className="text-sm text-muted transition-colors hover:text-ink dark:text-gray-500 dark:hover:text-white">Annuler</button>
           <button
             type="submit"
             disabled={saving}
@@ -735,10 +726,10 @@ function PublisherForm({ groups, publishers, initialData, onSaveStart, onSaved, 
           </SelectWrap>
         </Field>
 
-        {error && <p className="rounded-lg bg-red-950/40 px-3 py-2 text-sm text-red-300">{error}</p>}
+        {error && <p className="rounded-lg bg-red-50 px-3 py-2 text-sm text-red-600 dark:bg-red-950/40 dark:text-red-300">{error}</p>}
 
         <div className="flex items-center justify-end gap-3 pt-1">
-          <button type="button" onClick={onClose} className="text-sm text-gray-500 hover:text-white">Annuler</button>
+          <button type="button" onClick={onClose} className="text-sm text-muted transition-colors hover:text-ink dark:text-gray-500 dark:hover:text-white">Annuler</button>
           <button
             type="submit"
             disabled={saving}
@@ -770,68 +761,68 @@ function DeployToast({
   return (
     <div className="fixed bottom-6 right-6 z-50 w-80 select-none">
       {phase === 'saving' && (
-        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-white/10">
+        <div className="rounded-xl bg-white p-4 shadow-2xl ring-1 ring-ink/10 dark:bg-dark-card dark:ring-white/10">
           <div className="flex items-center gap-3">
-            <div className="h-8 w-8 shrink-0 animate-spin rounded-full border-2 border-white/10 border-t-indigo-400" />
+            <div className="h-8 w-8 shrink-0 animate-spin rounded-full border-2 border-ink/10 border-t-indigo-500 dark:border-white/10 dark:border-t-indigo-400" />
             <div>
-              <p className="text-sm font-semibold text-white">Enregistrement...</p>
-              <p className="text-xs text-gray-400">Modification en cours de sauvegarde</p>
+              <p className="text-sm font-semibold text-ink dark:text-white">Enregistrement...</p>
+              <p className="text-xs text-muted dark:text-gray-400">Modification en cours de sauvegarde</p>
             </div>
           </div>
-          <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-white/10">
+          <div className="mt-3 h-0.5 w-full overflow-hidden rounded-full bg-ink/10 dark:bg-white/10">
             <div className="animate-indeterminate h-full w-1/4 rounded-full bg-indigo-500" />
           </div>
         </div>
       )}
 
       {phase === 'deploying' && (
-        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-indigo-500/60">
+        <div className="rounded-xl bg-white p-4 shadow-2xl ring-1 ring-indigo-500/60 dark:bg-dark-card">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-500/20">
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-indigo-500/15 dark:bg-indigo-500/20">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#818cf8" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-white">Sauvegardé — déploiement en cours</p>
-              <p className="mt-0.5 text-xs text-gray-400">Les changements seront visibles dans 2–4 minutes</p>
+              <p className="text-sm font-semibold text-ink dark:text-white">Sauvegardé — déploiement en cours</p>
+              <p className="mt-0.5 text-xs text-muted dark:text-gray-400">Les changements seront visibles dans 2–4 minutes</p>
             </div>
-            <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
+            <button onClick={onDismiss} className="shrink-0 text-subtle transition-colors hover:text-ink dark:text-gray-600 dark:hover:text-white">✕</button>
           </div>
           <div className="mt-3 flex items-center gap-2 text-xs">
-            <span className="flex items-center gap-1.5 text-green-400">
-              <span className="h-1.5 w-1.5 rounded-full bg-green-400" />
+            <span className="flex items-center gap-1.5 text-green-600 dark:text-green-400">
+              <span className="h-1.5 w-1.5 rounded-full bg-green-500 dark:bg-green-400" />
               Sauvegardé
             </span>
             <div className="h-px flex-1 bg-indigo-500/60" />
-            <span className="animate-pulse font-medium text-indigo-400">Build CI</span>
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-gray-500">En ligne</span>
+            <span className="animate-pulse font-medium text-indigo-600 dark:text-indigo-400">Build CI</span>
+            <div className="h-px flex-1 bg-ink/10 dark:bg-white/10" />
+            <span className="text-muted dark:text-gray-500">En ligne</span>
           </div>
         </div>
       )}
 
       {phase === 'live' && (
-        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-green-500/60">
+        <div className="rounded-xl bg-white p-4 shadow-2xl ring-1 ring-green-500/60 dark:bg-dark-card">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/20">
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-500/15 dark:bg-green-500/20">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#4ade80" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="20 6 9 17 4 12"/>
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-green-400">Modification en ligne</p>
-              <p className="mt-0.5 text-xs text-gray-400">Vos changements sont maintenant visibles dans l'app</p>
+              <p className="text-sm font-semibold text-green-600 dark:text-green-400">Modification en ligne</p>
+              <p className="mt-0.5 text-xs text-muted dark:text-gray-400">Vos changements sont maintenant visibles dans l'app</p>
             </div>
-            <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
+            <button onClick={onDismiss} className="shrink-0 text-subtle transition-colors hover:text-ink dark:text-gray-600 dark:hover:text-white">✕</button>
           </div>
         </div>
       )}
 
       {phase === 'error' && (
-        <div className="rounded-xl bg-dark-card p-4 shadow-2xl ring-1 ring-red-500/60">
+        <div className="rounded-xl bg-white p-4 shadow-2xl ring-1 ring-red-500/60 dark:bg-dark-card">
           <div className="flex items-start gap-3">
-            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/20">
+            <div className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/15 dark:bg-red-500/20">
               <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#f87171" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <circle cx="12" cy="12" r="10"/>
                 <line x1="12" y1="8" x2="12" y2="12"/>
@@ -839,15 +830,15 @@ function DeployToast({
               </svg>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-sm font-semibold text-red-400">Échec du déploiement</p>
-              <p className="mt-0.5 text-xs text-gray-400">Le build CI a échoué. Vos données sont sauvegardées.</p>
+              <p className="text-sm font-semibold text-red-500 dark:text-red-400">Échec du déploiement</p>
+              <p className="mt-0.5 text-xs text-muted dark:text-gray-400">Le build CI a échoué. Vos données sont sauvegardées.</p>
             </div>
-            <button onClick={onDismiss} className="shrink-0 text-gray-600 hover:text-white">✕</button>
+            <button onClick={onDismiss} className="shrink-0 text-subtle transition-colors hover:text-ink dark:text-gray-600 dark:hover:text-white">✕</button>
           </div>
           <div className="mt-3 flex gap-2">
             <button
               onClick={onRetry}
-              className="flex-1 rounded-lg border border-white/10 px-3 py-2 text-sm font-medium text-white transition-colors hover:bg-white/10"
+              className="flex-1 rounded-lg border border-ink/10 px-3 py-2 text-sm font-medium text-ink transition-colors hover:bg-ink/5 dark:border-white/10 dark:text-white dark:hover:bg-white/10"
             >
               Réessayer
             </button>
@@ -943,10 +934,10 @@ export function AdminPage({ onNavigateToApp }: Props) {
     : groupsExpanded ? filteredGroups : filteredGroups.slice(0, GROUPS_DEFAULT)
 
   return (
-    <div className="min-h-screen bg-dark-surface text-white">
+    <div className="min-h-screen bg-paper text-ink dark:bg-dark-surface dark:text-white">
       {/* Mobile gate */}
       <div className="flex min-h-screen items-center justify-center md:hidden">
-        <p className="px-8 text-center text-sm text-gray-400">
+        <p className="px-8 text-center text-sm text-muted dark:text-gray-400">
           La page Admin est disponible sur ordinateur uniquement.
         </p>
       </div>
@@ -954,7 +945,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
       {/* Desktop */}
       <div className="hidden md:flex md:flex-col">
         {/* Header */}
-        <header className="flex items-center justify-between border-b border-white/10 px-8 py-4">
+        <header className="flex items-center justify-between border-b border-ink/10 px-8 py-4 dark:border-white/10">
           <div className="flex items-center gap-3">
             <svg width="32" height="32" viewBox="0 0 80 80" className="shrink-0 rounded-xl">
               <rect width="80" height="80" rx="20" fill="#4F46E5"/>
@@ -966,22 +957,24 @@ export function AdminPage({ onNavigateToApp }: Props) {
               <circle cx="57" cy="57" r="3" fill="#4F46E5"/>
             </svg>
             <div>
-              <h1 className="text-base font-semibold leading-tight">À qui ? — Admin</h1>
-              <p className="text-xs text-gray-400">Base de données éditoriale</p>
+              <h1 className="text-base font-semibold leading-tight text-ink dark:text-white">À qui ? — Admin</h1>
+              <p className="text-xs text-muted dark:text-gray-400">Base de données éditoriale</p>
             </div>
           </div>
 
           <nav className="flex items-center gap-1">
             <button
               onClick={onNavigateToApp}
-              className="rounded-md px-3 py-1.5 text-sm text-gray-400 transition-colors hover:text-white"
+              className="rounded-md px-3 py-1.5 text-sm text-muted transition-colors hover:text-ink dark:text-gray-400 dark:hover:text-white"
             >
               App
             </button>
             <button
               onClick={() => setTab('données')}
               className={`rounded-md px-3 py-1.5 text-sm transition-colors ${
-                tab === 'données' ? 'bg-white font-medium text-black' : 'text-gray-400 hover:text-white'
+                tab === 'données'
+                  ? 'bg-ink font-medium text-white dark:bg-white dark:text-black'
+                  : 'text-muted hover:text-ink dark:text-gray-400 dark:hover:text-white'
               }`}
             >
               Données
@@ -989,7 +982,9 @@ export function AdminPage({ onNavigateToApp }: Props) {
             <button
               onClick={() => setTab('signalements')}
               className={`flex items-center gap-2 rounded-md px-3 py-1.5 text-sm transition-colors ${
-                tab === 'signalements' ? 'bg-white font-medium text-black' : 'text-gray-400 hover:text-white'
+                tab === 'signalements'
+                  ? 'bg-ink font-medium text-white dark:bg-white dark:text-black'
+                  : 'text-muted hover:text-ink dark:text-gray-400 dark:hover:text-white'
               }`}
             >
               Signalements
@@ -1006,36 +1001,36 @@ export function AdminPage({ onNavigateToApp }: Props) {
 
         <main className="px-8 py-6">
           {loading ? (
-            <p className="text-sm text-gray-400">Chargement…</p>
+            <p className="text-sm text-muted dark:text-gray-400">Chargement…</p>
           ) : tab === 'données' ? (
             <div className="flex flex-col gap-6">
               {/* Stats */}
               <div className="flex items-center gap-6 text-sm">
                 <span>
-                  <strong className="text-white">{groups.length}</strong>{' '}
-                  <span className="text-gray-400">groupes</span>
+                  <strong className="text-ink dark:text-white">{groups.length}</strong>{' '}
+                  <span className="text-muted dark:text-gray-400">groupes</span>
                 </span>
                 <span>
-                  <strong className="text-white">{publishers.length}</strong>{' '}
-                  <span className="text-gray-400">éditeurs</span>
+                  <strong className="text-ink dark:text-white">{publishers.length}</strong>{' '}
+                  <span className="text-muted dark:text-gray-400">éditeurs</span>
                 </span>
                 <span>
-                  <strong className="text-white">{countries}</strong>{' '}
-                  <span className="text-gray-400">pays</span>
+                  <strong className="text-ink dark:text-white">{countries}</strong>{' '}
+                  <span className="text-muted dark:text-gray-400">pays</span>
                 </span>
                 {!tokenAvailable && (
-                  <span className="ml-auto rounded-lg border border-amber-800/50 bg-amber-950/30 px-3 py-1 text-xs text-amber-400">
+                  <span className="ml-auto rounded-lg border border-amber-600/50 bg-amber-50 px-3 py-1 text-xs text-amber-600 dark:border-amber-800/50 dark:bg-amber-950/30 dark:text-amber-400">
                     VITE_GITHUB_TOKEN manquant — lecture seule
                   </span>
                 )}
               </div>
 
               {/* Groups */}
-              <section className="overflow-hidden rounded-xl border border-white/10">
-                <div className="flex items-center gap-3 bg-white/5 px-5 py-4">
-                  <h2 className="shrink-0 text-sm font-semibold">
+              <section className="overflow-hidden rounded-xl border border-ink/10 dark:border-white/10">
+                <div className="flex items-center gap-3 bg-ink/5 px-5 py-4 dark:bg-white/5">
+                  <h2 className="shrink-0 text-sm font-semibold text-ink dark:text-white">
                     Groupes{' '}
-                    <span className="ml-1.5 font-normal text-gray-400">{filteredGroups.length}</span>
+                    <span className="ml-1.5 font-normal text-muted dark:text-gray-400">{filteredGroups.length}</span>
                   </h2>
                   <div className="ml-auto">
                     <input
@@ -1043,27 +1038,27 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       placeholder="Filtrer par ID…"
                       value={groupSearch}
                       onChange={e => setGroupSearch(e.target.value)}
-                      className="w-60 rounded-lg border border-white/10 bg-dark-surface px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-ink/10 bg-paper px-3 py-1.5 text-sm text-ink placeholder:text-muted/40 focus:border-indigo-500 focus:outline-none dark:border-white/10 dark:bg-dark-surface dark:text-white dark:placeholder:text-gray-600"
                     />
                   </div>
                   <button
                     disabled={!tokenAvailable}
                     onClick={() => setAddModal('group')}
-                    className="shrink-0 rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="shrink-0 rounded-lg border border-ink/20 px-3 py-1.5 text-sm text-ink transition-colors hover:bg-ink/5 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/20 dark:text-white dark:hover:bg-white/10"
                   >
                     + Ajouter
                   </button>
                 </div>
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-y border-white/10">
-                      <th className="w-36 px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">ID</th>
-                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Nom</th>
-                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Propriétaire</th>
-                      <th className="w-24 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Coté</th>
-                      <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Note</th>
-                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Distributeur</th>
-                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Diffuseur</th>
+                    <tr className="border-y border-ink/10 dark:border-white/10">
+                      <th className="w-36 px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">ID</th>
+                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Nom</th>
+                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Propriétaire</th>
+                      <th className="w-24 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Coté</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Note</th>
+                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Distributeur</th>
+                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Diffuseur</th>
                       <th className="w-20 px-4 py-2.5"></th>
                     </tr>
                   </thead>
@@ -1074,49 +1069,49 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       return (
                         <tr
                           key={g.id}
-                          className={`transition-colors hover:bg-white/5 ${
-                            i < displayedGroups.length - 1 ? 'border-b border-white/5' : ''
+                          className={`transition-colors hover:bg-ink/5 dark:hover:bg-white/5 ${
+                            i < displayedGroups.length - 1 ? 'border-b border-ink/5 dark:border-white/5' : ''
                           }`}
                         >
-                          <td className="px-5 py-3.5 font-mono text-xs text-gray-400">{g.id}</td>
-                          <td className="px-4 py-3.5 font-semibold">{g.name}</td>
-                          <td className="px-4 py-3.5 text-gray-300">{g.owner}</td>
+                          <td className="px-5 py-3.5 font-mono text-xs text-muted dark:text-gray-400">{g.id}</td>
+                          <td className="px-4 py-3.5 font-semibold text-ink dark:text-white">{g.name}</td>
+                          <td className="px-4 py-3.5 text-ink/70 dark:text-gray-300">{g.owner}</td>
                           <td className="px-4 py-3.5">
                             {g.listed ? (
-                              <span className="rounded-full bg-red-500/20 px-2 py-0.5 text-xs font-medium text-red-300">
+                              <span className="rounded-full bg-red-500/10 px-2 py-0.5 text-xs font-medium text-red-600 dark:bg-red-500/20 dark:text-red-300">
                                 Coté
                               </span>
                             ) : (
-                              <span className="rounded-full bg-white/10 px-2 py-0.5 text-xs font-medium text-gray-300">
+                              <span className="rounded-full bg-ink/5 px-2 py-0.5 text-xs font-medium text-ink/60 dark:bg-white/10 dark:text-gray-300">
                                 Indép.
                               </span>
                             )}
                           </td>
-                          <td className="max-w-xs truncate px-4 py-3.5 text-xs text-gray-400">
+                          <td className="max-w-xs truncate px-4 py-3.5 text-xs text-muted dark:text-gray-400">
                             {g.note}
                           </td>
                           <td className="px-4 py-3.5">
                             {g.distributeur ? (
                               <div>
-                                <div className="text-xs text-gray-300">{g.distributeur}</div>
-                                <div className="text-xs text-gray-500">{g.distributeur_owner}</div>
+                                <div className="text-xs text-ink/70 dark:text-gray-300">{g.distributeur}</div>
+                                <div className="text-xs text-muted dark:text-gray-500">{g.distributeur_owner}</div>
                               </div>
-                            ) : <span className="text-gray-600">—</span>}
+                            ) : <span className="text-ink/30 dark:text-gray-600">—</span>}
                           </td>
                           <td className="px-4 py-3.5">
                             {g.diffuseur ? (
                               <div>
-                                <div className="text-xs text-gray-300">{g.diffuseur}</div>
-                                <div className="text-xs text-gray-500">{g.diffuseur_owner}</div>
+                                <div className="text-xs text-ink/70 dark:text-gray-300">{g.diffuseur}</div>
+                                <div className="text-xs text-muted dark:text-gray-500">{g.diffuseur_owner}</div>
                               </div>
-                            ) : <span className="text-gray-600">—</span>}
+                            ) : <span className="text-ink/30 dark:text-gray-600">—</span>}
                           </td>
                           <td className="px-4 py-3.5">
                             <div className="flex items-center justify-end gap-1">
                               <button
                                 disabled={!tokenAvailable}
                                 onClick={() => setEditingGroup(g)}
-                                className="rounded p-1.5 text-gray-500 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                                className="rounded p-1.5 text-muted transition-colors hover:bg-ink/10 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30 dark:text-gray-500 dark:hover:bg-white/10 dark:hover:text-white"
                                 title="Modifier"
                               >
                                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1132,7 +1127,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                                     await deleteGroup(g.id, groups)
                                     loadData()
                                   }}
-                                  className="rounded p-1.5 text-gray-500 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+                                  className="rounded p-1.5 text-muted transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30 dark:text-gray-500 dark:hover:bg-red-500/20 dark:hover:text-red-400"
                                   title={canDelete ? 'Supprimer' : undefined}
                                 >
                                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1143,7 +1138,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                                   </svg>
                                 </button>
                                 {!canDelete && (
-                                  <div className="pointer-events-none absolute bottom-full right-0 mb-2 hidden w-52 rounded-lg bg-gray-900 px-3 py-2 text-xs text-gray-300 shadow-xl ring-1 ring-white/10 group-hover/del:block">
+                                  <div className="pointer-events-none absolute bottom-full right-0 mb-2 hidden w-52 rounded-lg bg-white px-3 py-2 text-xs text-ink shadow-xl ring-1 ring-ink/10 group-hover/del:block dark:bg-gray-900 dark:text-gray-300 dark:ring-white/10">
                                     Ce groupe contient {linkedPublishers.length} éditeur{linkedPublishers.length > 1 ? 's' : ''} — supprimez-les d'abord.
                                   </div>
                                 )}
@@ -1158,7 +1153,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                 {!groupSearch.trim() && filteredGroups.length > GROUPS_DEFAULT && (
                   <button
                     onClick={() => setGroupsExpanded(v => !v)}
-                    className="w-full border-t border-white/10 py-3 text-sm text-gray-400 transition-colors hover:bg-white/5 hover:text-white"
+                    className="w-full border-t border-ink/10 py-3 text-sm text-muted transition-colors hover:bg-ink/5 hover:text-ink dark:border-white/10 dark:text-gray-400 dark:hover:bg-white/5 dark:hover:text-white"
                   >
                     {groupsExpanded ? 'Réduire' : `Tout afficher (${groups.length})`}
                   </button>
@@ -1166,17 +1161,17 @@ export function AdminPage({ onNavigateToApp }: Props) {
               </section>
 
               {/* Publishers */}
-              <section className="overflow-hidden rounded-xl border border-white/10">
-                <div className="flex items-center gap-3 bg-white/5 px-5 py-4">
-                  <h2 className="shrink-0 text-sm font-semibold">
+              <section className="overflow-hidden rounded-xl border border-ink/10 dark:border-white/10">
+                <div className="flex items-center gap-3 bg-ink/5 px-5 py-4 dark:bg-white/5">
+                  <h2 className="shrink-0 text-sm font-semibold text-ink dark:text-white">
                     Éditeurs{' '}
-                    <span className="ml-1.5 font-normal text-gray-400">{filteredPublishers.length}</span>
+                    <span className="ml-1.5 font-normal text-muted dark:text-gray-400">{filteredPublishers.length}</span>
                   </h2>
                   <div className="ml-auto flex items-center gap-2">
                     <SelectWrap
                       value={publisherGroupFilter}
                       onChange={e => setPublisherGroupFilter(e.target.value)}
-                      className="w-60 rounded-lg border border-white/10 bg-dark-surface px-3 py-1.5 text-sm text-white focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-ink/10 bg-paper px-3 py-1.5 text-sm text-ink focus:border-indigo-500 focus:outline-none dark:border-white/10 dark:bg-dark-surface dark:text-white"
                     >
                       <option value="">Tous les groupes</option>
                       {groups.map(g => (
@@ -1188,26 +1183,26 @@ export function AdminPage({ onNavigateToApp }: Props) {
                       placeholder="Filtrer par ID…"
                       value={publisherSearch}
                       onChange={e => setPublisherSearch(e.target.value)}
-                      className="w-60 rounded-lg border border-white/10 bg-dark-surface px-3 py-1.5 text-sm text-white placeholder:text-gray-600 focus:border-indigo-500 focus:outline-none"
+                      className="w-60 rounded-lg border border-ink/10 bg-paper px-3 py-1.5 text-sm text-ink placeholder:text-muted/40 focus:border-indigo-500 focus:outline-none dark:border-white/10 dark:bg-dark-surface dark:text-white dark:placeholder:text-gray-600"
                     />
                   </div>
                   <button
                     disabled={!tokenAvailable}
                     onClick={() => setAddModal('publisher')}
-                    className="shrink-0 rounded-lg border border-white/20 px-3 py-1.5 text-sm transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-40"
+                    className="shrink-0 rounded-lg border border-ink/20 px-3 py-1.5 text-sm text-ink transition-colors hover:bg-ink/5 disabled:cursor-not-allowed disabled:opacity-40 dark:border-white/20 dark:text-white dark:hover:bg-white/10"
                   >
                     + Ajouter
                   </button>
                 </div>
                 <table className="w-full text-sm">
                   <thead>
-                    <tr className="border-y border-white/10">
-                      <th className="w-28 px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">ID</th>
-                      <th className="w-36 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Nom</th>
-                      <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Variantes</th>
-                      <th className="w-16 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Pays</th>
-                      <th className="w-20 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Fondé</th>
-                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-gray-400">Groupe</th>
+                    <tr className="border-y border-ink/10 dark:border-white/10">
+                      <th className="w-28 px-5 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">ID</th>
+                      <th className="w-36 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Nom</th>
+                      <th className="px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Variantes</th>
+                      <th className="w-16 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Pays</th>
+                      <th className="w-20 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Fondé</th>
+                      <th className="w-44 px-4 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-muted dark:text-gray-400">Groupe</th>
                       <th className="w-20 px-4 py-2.5"></th>
                     </tr>
                   </thead>
@@ -1215,20 +1210,20 @@ export function AdminPage({ onNavigateToApp }: Props) {
                     {filteredPublishers.map((p, i) => (
                       <tr
                         key={p.id}
-                        className={`transition-colors hover:bg-white/5 ${
-                          i < filteredPublishers.length - 1 ? 'border-b border-white/5' : ''
+                        className={`transition-colors hover:bg-ink/5 dark:hover:bg-white/5 ${
+                          i < filteredPublishers.length - 1 ? 'border-b border-ink/5 dark:border-white/5' : ''
                         }`}
                       >
-                        <td className="px-5 py-3 font-mono text-xs text-gray-400">{p.id}</td>
-                        <td className="px-4 py-3 font-semibold">{p.name}</td>
-                        <td className="max-w-[260px] truncate px-4 py-3 text-xs text-gray-400">
+                        <td className="px-5 py-3 font-mono text-xs text-muted dark:text-gray-400">{p.id}</td>
+                        <td className="px-4 py-3 font-semibold text-ink dark:text-white">{p.name}</td>
+                        <td className="max-w-[260px] truncate px-4 py-3 text-xs text-muted dark:text-gray-400">
                           {p.name_variants.join('|')}
                         </td>
-                        <td className="px-4 py-3 text-gray-400">{p.country}</td>
-                        <td className="px-4 py-3 text-gray-400">{p.founded_year ?? '—'}</td>
+                        <td className="px-4 py-3 text-muted dark:text-gray-400">{p.country}</td>
+                        <td className="px-4 py-3 text-muted dark:text-gray-400">{p.founded_year ?? '—'}</td>
                         <td className="px-4 py-3">
                           <span
-                            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-2 py-0.5 text-xs font-medium"
+                            className="inline-flex items-center gap-1.5 rounded-full border border-ink/10 px-2 py-0.5 text-xs font-medium dark:border-white/10"
                             style={{ color: groupColor(p.group_id) }}
                           >
                             <span
@@ -1243,7 +1238,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                             <button
                               disabled={!tokenAvailable}
                               onClick={() => setEditingPublisher(p)}
-                              className="rounded p-1.5 text-gray-500 transition-colors hover:bg-white/10 hover:text-white disabled:cursor-not-allowed disabled:opacity-30"
+                              className="rounded p-1.5 text-muted transition-colors hover:bg-ink/10 hover:text-ink disabled:cursor-not-allowed disabled:opacity-30 dark:text-gray-500 dark:hover:bg-white/10 dark:hover:text-white"
                               title="Modifier"
                             >
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -1258,7 +1253,7 @@ export function AdminPage({ onNavigateToApp }: Props) {
                                 await deletePublisher(p.id, publishers)
                                 loadData()
                               }}
-                              className="rounded p-1.5 text-gray-500 transition-colors hover:bg-red-500/20 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-30"
+                              className="rounded p-1.5 text-muted transition-colors hover:bg-red-500/10 hover:text-red-500 disabled:cursor-not-allowed disabled:opacity-30 dark:text-gray-500 dark:hover:bg-red-500/20 dark:hover:text-red-400"
                               title="Supprimer"
                             >
                               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
