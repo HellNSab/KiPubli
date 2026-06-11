@@ -196,7 +196,7 @@ function App() {
 
           <footer className="mt-8 text-center text-[11px] text-subtle">
             Données mises à jour bénévolement, susceptibles d'être incomplètes ·
-            Métadonnées via Google Books
+            Métadonnées via Open Library
           </footer>
         </div>
       )}
@@ -410,7 +410,7 @@ function App() {
                 </div>
 
                 <div className="overflow-hidden rounded-2xl border border-stone-200 dark:border-stone-800">
-                  {recentResults.map((result, i) => {
+                  {(recentResults || []).map((result, i) => {
                     const badge = result.chain
                       ? result.chain.group.listed
                         ? {
@@ -484,7 +484,7 @@ function App() {
 
           <footer className="mt-8 text-center text-[11px] text-subtle">
             Données mises à jour bénévolement, susceptibles d'être incomplètes ·
-            Métadonnées via Google Books
+            Métadonnées via Open Library
           </footer>
         </div>
       )}

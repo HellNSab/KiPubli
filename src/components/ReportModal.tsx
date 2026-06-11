@@ -20,7 +20,7 @@ function buildIssueBody(
     `**Titre :** ${book.title}`,
     `**Auteur(s) :** ${book.authors.join(", ") || "inconnu"}`,
     `**ISBN :** ${book.isbn}`,
-    `**Éditeur brut (Google Books) :** ${book.publisherRaw ?? "non renseigné"}`,
+    `**Éditeur brut (Open Library) :** ${book.publisherRaw ?? "non renseigné"}`,
     "",
     "## Résultat affiché par l'application",
     chain
@@ -168,7 +168,7 @@ export function ReportModal({ book, chain, onClose }: Props) {
               </p>
               {book.publisherRaw && (
                 <p className="mt-1">
-                  <span className="font-medium">Éditeur (Google Books) :</span>{" "}
+                  <span className="font-medium">Éditeur (Open Library) :</span>{" "}
                   {book.publisherRaw}
                 </p>
               )}

@@ -147,7 +147,7 @@ async function scanIsbn(page: Page, isbn: string): Promise<void> {
 test.describe('Scan ISBN → vérification chaîne éditoriale (production)', () => {
   for (const book of BOOKS) {
     test(`${book.isbn} — ${book.title}`, async ({ page }) => {
-      await page.goto('/');
+      await page.goto('./');
       await scanIsbn(page, book.isbn);
 
       // The "Éditeur non identifié" banner must not appear

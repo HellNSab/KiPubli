@@ -75,7 +75,9 @@ async function fetchFromOpenLibraryApi(
   if (!res.ok) throw new Error(`Open library a répondu ${res.status}`);
 
   const data = (await res.json()) as OpenLibraryResponse;
-  const authorIds = data.authors.map((a) => a.key.split("/").slice(-1)[0]);
+  const authorIds = (data.authors || []).map(
+    (a) => a.key.split("/").slice(-1)[0],
+  );
   const authorNames = await Promise.all(
     authorIds.map(async (id) => {
       const res = await fetchWithRetry(

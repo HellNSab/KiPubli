@@ -368,7 +368,7 @@ export function ResultCard({ book, chain }: Props) {
           <p className="mt-1 text-sm text-amber-800 dark:text-amber-400">
             {book.publisherRaw ? (
               <>
-                Google Books indique <em>« {book.publisherRaw} »</em> mais cet
+                Open Library indique <em>« {book.publisherRaw} »</em> mais cet
                 éditeur ne figure pas encore dans notre base.
               </>
             ) : (
